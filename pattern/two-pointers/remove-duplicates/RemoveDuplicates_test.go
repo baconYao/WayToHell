@@ -16,6 +16,7 @@ func TestRemoveDuplicates(t *testing.T) {
 	}{
 		{[]int{2, 3, 3, 3, 6, 9, 9}, 4, "The first four elements after removing the duplicates will be [2, 3, 6, 9]."},
 		{[]int{2, 2, 2, 11}, 2, "The first two elements after removing the duplicates will be [2, 11]."},
+		{[]int{}, 0, "No element exists after removing the duplicates, it will be []."},
 	}
 
 	for _, e := range theTests {
