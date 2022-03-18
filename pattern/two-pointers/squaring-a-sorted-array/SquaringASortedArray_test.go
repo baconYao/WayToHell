@@ -15,6 +15,8 @@ func TestSquaringASortedArray(t *testing.T) {
 	}{
 		{[]int{-2, -1, 0, 2, 3}, []int{0, 1, 4, 4, 9}},
 		{[]int{-3, -1, 0, 1, 2}, []int{0, 1, 1, 4, 9}},
+		{[]int{-3}, []int{9}},
+		{[]int{}, []int{}},
 	}
 
 	for _, e := range theTests {
