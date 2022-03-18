@@ -21,3 +21,14 @@ func Min(x, y int) int {
 	}
 	return y
 }
+
+func AbsInt(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+func SquareInt(x int) int {
+	return x * x
+}
