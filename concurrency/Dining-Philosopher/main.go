@@ -1,6 +1,10 @@
 package main
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+	"time"
+)
 
 // The Dining Philosophers problem is well known in computer science circles.
 // Five philosophers, numbered from 0 through 4, live in a house where the
@@ -11,24 +15,59 @@ import "sync"
 // difficulty. As a consequence, however, this means that no two neighbours
 // may be eating simultaneously.
 
-// variables - philosophers
-var philosophers = []string{"Patrick", "Ling", "Peter", "sherry", "Judy"}
-var wg sync.WaitGroup
+// const
+const hunger = 3 // 每位哲學家要吃三次飯
 
-func diningProblem(philosopher string, dominantHand, otherHand *sync.Mutex) {
+// variables - philosophers
+var philosophers = []string{"1-Patrick", "2-Ling", "3-Peter", "4-sherry", "5-Judy"}
+var wg sync.WaitGroup
+var sleepTime = 1 * time.Second
+var eatTime = 2 * time.Second
+var thinkTime = 1 * time.Second
+
+func diningProblem(philosopher string, leftFork, rightFork *sync.Mutex) {
 	defer wg.Done()
 
 	// print a message
+	fmt.Println(philosopher, "is seated")
+	time.Sleep(sleepTime)
 
-	// lock both forks
+	for i := hunger; i > 0; i-- {
+		fmt.Println(philosopher, "is hungry.")
+		time.Sleep(sleepTime)
 
-	// print a message
+		// lock both forks
+		leftFork.Lock()
+		fmt.Printf("\t%s picked up the fork to his left\n", philosopher)
+		rightFork.Lock()
+		fmt.Printf("\t%s picked up the fork to his right\n", philosopher)
 
-	// unlock the mutexes
+		// print a message
+		fmt.Println(philosopher, "has both forks, and is eating.")
+		time.Sleep(eatTime)
+
+		// Give the philosopher some time to think
+		fmt.Println(philosopher, "is thinking")
+		time.Sleep(thinkTime)
+
+		// unlock the mutexes
+		rightFork.Unlock()
+		fmt.Printf("\t%s put down the fork on his right\n", philosopher)
+		leftFork.Unlock()
+		fmt.Printf("\t%s put down the fork on his left\n", philosopher)
+		time.Sleep(sleepTime)
+	}
+	// print out done message
+	fmt.Println(philosopher, "is satisfied")
+	time.Sleep(sleepTime)
+
+	fmt.Println(philosopher, "has left the table")
 }
 
 func main() {
 	// print intro
+	fmt.Println("The Dining Philosophers problem")
+	fmt.Println("-------------------------------")
 
 	forkLeft := &sync.Mutex{}
 	wg.Add(len(philosophers))
@@ -43,4 +82,6 @@ func main() {
 		forkLeft = forkRight
 	}
 	wg.Wait()
+
+	fmt.Println("The table is empty")
 }
