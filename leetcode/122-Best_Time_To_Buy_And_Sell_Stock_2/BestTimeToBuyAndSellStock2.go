@@ -24,3 +24,22 @@ func BestTimeToBuyAndSellStock2(prices []int) int {
 	// [4,6,10] 這種最後沒有變小的 case
 	return totalProfit + tmpMaxProfit
 }
+
+// Method 2
+// 也是加總獲利的部分，相較於 Method 1，更為簡潔
+func BestTimeToBuyAndSellStock2_2(prices []int) int {
+	profit := 0
+
+	for i := range prices {
+		if i == 0 {
+			continue
+		}
+
+		//compare current with previous
+		if prices[i] > prices[i-1] {
+			profit += (prices[i] - prices[i-1])
+		}
+	}
+
+	return profit
+}
