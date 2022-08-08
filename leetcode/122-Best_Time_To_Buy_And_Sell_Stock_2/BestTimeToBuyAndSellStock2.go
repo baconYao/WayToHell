@@ -43,3 +43,28 @@ func BestTimeToBuyAndSellStock2_2(prices []int) int {
 
 	return profit
 }
+
+// Method 3
+// DP 的方法
+func BestTimeToBuyAndSellStockDP(prices []int) int {
+	dp := make([][]int, 0)
+	for i := 0; i < len(prices); i++ {
+		// Base value
+		if i-1 == -1 {
+			// dp[0][0] = 0, dp[0][1] = -prices[0]
+			dp = append(dp, []int{0, -prices[0]})
+			continue
+		}
+		dp_i_0 := Max(dp[i-1][0], dp[i-1][1]+prices[i])
+		dp_i_1 := Max(dp[i-1][1], dp[i-1][0]-prices[i])
+		dp = append(dp, []int{dp_i_0, dp_i_1})
+	}
+	return dp[len(prices)-1][0]
+}
+
+func Max(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
+}
