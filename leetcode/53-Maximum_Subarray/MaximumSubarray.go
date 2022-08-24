@@ -5,6 +5,7 @@ import "math"
 // Method 1
 // Sliding Window
 // Time: O(N), Space: O(1)
+// https://www.youtube.com/watch?v=5WZl3MMT0Eg&t=475s
 func MaximumSubarray(nums []int) int {
 	maxSub := nums[0]
 	currentSum := 0
