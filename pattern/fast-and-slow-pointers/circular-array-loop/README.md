@@ -10,8 +10,6 @@ It should be noted that a cycle in the array does not have to originate at the b
 
 # Constraints:
 
-Let n be the number of nodes in a linked list.
-
 - 1 <= nums.length <= 10^4
 - -5000 <= nums[i] <= 5000
 - nums[i] != 0
