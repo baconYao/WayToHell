@@ -19,6 +19,7 @@ func TestMinWindow(t *testing.T) {
 		{"michmznaitnjdnjkdsnmichmznait", "michmznait", "michmznait"},
 		{"afgegrwgwga", "aa", "afgegrwgwga"},
 		{"abcdbebe", "bbe", "bebe"},
+		{"abcd", "g", ""},
 	}
 
 	for _, e := range theTests {
