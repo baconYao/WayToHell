@@ -14,12 +14,14 @@ func TestMinWindow(t *testing.T) {
 		input2         string
 		expectedResult string
 	}{
+		{"abcde", "bd", "bcd"},
 		{"abcdebdde", "bde", "bcde"},
 		{"fgrqsqsnodwmxzkzxwqegkndaa", "kzed", "kzxwqegknd"},
 		{"michmznaitnjdnjkdsnmichmznait", "michmznait", "michmznait"},
 		{"afgegrwgwga", "aa", "afgegrwgwga"},
 		{"abcdbebe", "bbe", "bebe"},
 		{"abcd", "g", ""},
+		{"g", "ggg", ""},
 	}
 
 	for _, e := range theTests {

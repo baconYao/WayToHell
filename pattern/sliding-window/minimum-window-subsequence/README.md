@@ -25,4 +25,7 @@ In this example, `"abbc"` is a substring of `str1`, from which we can derive `st
 
 # Reference
 
+- [727. Minimum Window Substring](https://leetcode.com/problems/minimum-window-subsequence/description/)
+
+## Similar
 - [76. Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/description/)
