@@ -7,7 +7,7 @@ Return the length of the longest substring containing the same letter you can ge
 # Constraints:
 
 - 1 <= `s.length` <= 10 ^ 5
-- `s` consists of only uppercase English letters.
+- `s` consists of only lowercase English letters.
 - `0 <= k <= s.length`
 
 # Reference

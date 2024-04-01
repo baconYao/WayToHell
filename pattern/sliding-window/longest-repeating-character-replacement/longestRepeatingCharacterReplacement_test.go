@@ -14,8 +14,8 @@ func TestCharacterReplacement(t *testing.T) {
 		input2         int
 		expectedResult int
 	}{
-		{"ABAB", 2, 4},
-		{"AABABBA", 1, 4},
+		{"abab", 2, 4},
+		{"aababba", 1, 4},
 		{"aaacbbbaabab", 2, 6},
 		{"aaacbbbaabab", 1, 4},
 		{"dippitydip", 4, 6},
