@@ -24,3 +24,20 @@ func CharacterReplacement(s string, k int) int {
 
 	return lengthOfMaxSubstring
 }
+
+func characterReplacement2(s string, k int) int {
+	cnts := make([]int, 26)
+	maxCnts, start, ans := 0, 0, 0
+
+	for end, v := range s {
+		cnts[v-'A']++
+		maxCnts = utils.Max(maxCnts, cnts[v-'A'])
+		for end-start-maxCnts+1 > k {
+			cnts[s[start]-'A']--
+			//maxCnts = max(maxCnts, cnts[s[start] - 'A'])
+			start++
+		}
+		ans = utils.Max(ans, end-start+1)
+	}
+	return ans
+}
