@@ -25,7 +25,7 @@ func main() {
 		templateMap: make(map[string]*template.Template),
 	}
 
-	flag.BoolVar(&app.config.useCache, "cache", false, "Use template cache")
+	flag.BoolVar(&app.config.useCache, "cache", true, "Use template cache")
 	flag.Parse()
 
 	srv := &http.Server{
