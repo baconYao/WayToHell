@@ -1,2 +1,4 @@
 github.com/go-chi/chi/v5 v5.0.12 h1:9euLV5sTrTNTRUU9POmDUvfxyj6LAABLUcEWO+JJb4s=
 github.com/go-chi/chi/v5 v5.0.12/go.mod h1:DslCQbL2OYiznFReuXYUmQ2hGd1aDpCnlMNITLSKoi8=
+github.com/tsawler/toolbox v1.3.1 h1:zqnt5L5dmWiBrs2JgE1VeHJJO/IMStFKQgWxc+eriEE=
+github.com/tsawler/toolbox v1.3.1/go.mod h1:bYUEtJ09HFx534XcjXdTIzv7MCKsg9SrhSGELFe6HI4=
