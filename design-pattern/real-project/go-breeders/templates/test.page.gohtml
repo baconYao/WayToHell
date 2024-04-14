@@ -14,6 +14,20 @@
             <div class="mt-2" style="outline: 1px solid silver; padding: 2em;">
                 <pre id="dog-factory-output"><span class="text-muted">Nothing received yet...</span></pre>
             </div>
+
+            <hr class="mt-4">
+            <h3 class="mt-3">Abstract Factory</h3>
+            <div>
+                <a href="javascript:void(0);" id="dog-abstract-btn" class="btn btn-outline-secondary">
+                    Get a dog from abstractory factory
+                </a>
+                <a href="javascript:void(0);" id="cat-abstract-btn" class="btn btn-outline-secondary">
+                    Get a cat from abstractory factory
+                </a>
+            </div>
+            <div class="mt-2" style="outline: 1px solid silver; padding: 2em;">
+                <pre id="abstract-output"><span class="text-muted">Nothing received yet...</span></pre>
+            </div>
         </div>
     </div>
 </div>
@@ -24,6 +38,10 @@
 let dogFactoryButton = document.getElementById("dog-factory-btn")
 let catFactoryButton = document.getElementById("cat-factory-btn")
 let dogFactoryOutput = document.getElementById("dog-factory-output")
+
+let dogAbstractBtn = document.getElementById("dog-abstract-btn")
+let catAbstractBtn = document.getElementById("cat-abstract-btn")
+let abstractFactoryOutput = document.getElementById("abstract-output")
 
 document.addEventListener("DOMContentLoaded", function() {
     dogFactoryButton.addEventListener("click", function() {
@@ -46,6 +64,30 @@ document.addEventListener("DOMContentLoaded", function() {
                 dogFactoryOutput.innerHTML = data.error;
             } else {
                 dogFactoryOutput.innerHTML = JSON.stringify(data, undefined, 4);
+            }
+        })
+    })
+
+    dogAbstractBtn.addEventListener("click", function() {
+        fetch("/api/dog-from-abstract-factory", {method: 'get'})
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.error) {
+                abstractFactoryOutput.innerHTML = data.error;
+            } else {
+                abstractFactoryOutput.innerHTML = JSON.stringify(data, undefined, 4);
+            }
+        })
+    })
+
+    catAbstractBtn.addEventListener("click", function() {
+        fetch("/api/cat-from-abstract-factory", {method: 'get'})
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.error) {
+                abstractFactoryOutput.innerHTML = data.error;
+            } else {
+                abstractFactoryOutput.innerHTML = JSON.stringify(data, undefined, 4);
             }
         })
     })
