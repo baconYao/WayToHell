@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+
+  #  start MariaDB, and ensure that data is stored to a mounted volume
+  mariadb:
+    image: 'mariadb:10'
+    userns_mode: "keep-id"
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: breeders
+      MYSQL_USER: mariadb
+      MYSQL_PASSWORD: myverysecretpassword
+    volumes:
+      - ./db-data/mariadb:/var/lib/mysql:rw
+      - ./sql/breeders_mysql.sql:/docker-entrypoint-initdb.d/create_tables.sql:rw
+
+#  postgres:
+#    image: 'postgres:14'
+#    restart: always
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: myverysecretpassword
+#      POSTGRES_DB: breeders
+#    logging:
+#      options:
+#        max-size: 10m
+#        max-file: "3"
+#    ports:
+#      - '5432:5432'
+#    volumes:
+#      - ./db-data/postgres:/var/lib/postgresql/data
+#      - ./sql/postgres.sql:/docker-entrypoint-initdb.d/create_tables.sql
