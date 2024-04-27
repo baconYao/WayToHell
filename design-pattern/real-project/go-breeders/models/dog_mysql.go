@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func (d *DogBreed) AllDogBreeds() ([]*DogBreed, error) {
+func (m *mysqlRepository) AllDogBreeds() ([]*DogBreed, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -16,7 +16,7 @@ func (d *DogBreed) AllDogBreeds() ([]*DogBreed, error) {
 				from dog_breeds order by breed`
 	var breeds []*DogBreed
 
-	rows, err := db.QueryContext(ctx, query)
+	rows, err := m.DB.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
