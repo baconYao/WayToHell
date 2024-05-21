@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-breeders/pets"
 	"net/http"
+	"net/url"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/tsawler/toolbox"
@@ -115,10 +116,27 @@ func (app *application) GetAllCatBreeds(w http.ResponseWriter, r *http.Request) 
 
 	// Since we are using the adpater pattern, this handler does not care where it gets the data from
 	// it will simple use whatever is stored in app.catServices
-	catBreeds, err := app.catService.GetAllBreeds()
+	catBreeds, err := app.App.CatService.GetAllBreeds()
 	if err != nil {
 		_ = t.ErrorJSON(w, err, http.StatusBadRequest)
 	}
 
 	_ = t.WriteJSON(w, http.StatusOK, catBreeds)
+}
+
+func (app *application) AnimalFromAbstractFactory(w http.ResponseWriter, r *http.Request) {
+	// Setup toolbox
+	var t toolbox.Tools
+	// Get Species from URL itself
+	species := chi.URLParam(r, "species")
+	// Get breed from the URL
+	b := chi.URLParam(r, "breed")
+	breed, _ := url.QueryUnescape(b)
+	// Create a pet from abstract factory
+	pet, err := pets.NewPetWithBreedFromAbstractFactory(species, breed)
+	if err != nil {
+		_ = t.ErrorJSON(w, err, http.StatusBadRequest)
+	}
+	// Write the result as JSON.
+	_ = t.WriteJSON(w, http.StatusOK, pet)
 }

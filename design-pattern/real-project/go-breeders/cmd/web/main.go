@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"go-breeders/adapters"
 	"go-breeders/configuration"
 	"html/template"
 	"log"
@@ -16,7 +17,6 @@ type application struct {
 	templateMap map[string]*template.Template
 	config      appConfig
 	App         *configuration.Application
-	catService  *RemoteService
 }
 
 type appConfig struct {
@@ -39,14 +39,13 @@ func main() {
 		log.Panic(err)
 	}
 
-	// jsonBackend := &JSONBackend{}
-	// jsonAdapter := &RemoteService{Remote: jsonBackend}
+	// jsonBackend := &adapters.JSONBackend{}
+	// jsonAdapter := &adapters.RemoteService{Remote: jsonBackend}
 
-	XMLBackend := &XMLBackend{}
-	xmlAdapter := &RemoteService{Remote: XMLBackend}
+	XMLBackend := &adapters.XMLBackend{}
+	xmlAdapter := &adapters.RemoteService{Remote: XMLBackend}
 
-	app.App = configuration.New(db)
-	app.catService = xmlAdapter
+	app.App = configuration.New(db, xmlAdapter)
 
 	srv := &http.Server{
 		Addr:              port,
