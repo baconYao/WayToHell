@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"go-breeders/models"
 	"go-breeders/pets"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/tsawler/toolbox"
@@ -17,6 +19,40 @@ func (app *application) ShowHome(w http.ResponseWriter, r *http.Request) {
 func (app *application) ShowPage(w http.ResponseWriter, r *http.Request) {
 	page := chi.URLParam(r, "page")
 	app.render(w, fmt.Sprintf("%s.page.gohtml", page), nil)
+}
+
+func (app *application) DogOfMonth(w http.ResponseWriter, r *http.Request) {
+	// Get the breed
+	breed, _ := app.App.Models.DogBreed.GetBreedByName("German Shepherd Dog")
+
+	// Get the dog of the month from database
+	dom, _ := app.App.Models.Dog.GetDogOfMonthByID(1)
+
+	layout := "2006-01-02"
+	dob, _ := time.Parse(layout, "2023-11-01")
+
+	// Create a dog and decorate it
+	dog := models.DogOfMonth{
+		Dog: &models.Dog{
+			ID:               1,
+			DogName:          "Sam",
+			BreedID:          breed.ID,
+			Color:            "Black & Tan",
+			DateOfBirth:      dob,
+			SpayedOrNeutered: 0,
+			Description:      "Sam is a very good boy",
+			Weight:           20,
+			Breed:            *breed,
+		},
+		Video: dom.Video,
+		Image: dom.Image,
+	}
+
+	// Serve the web page
+	data := make(map[string]any)
+	data["dog"] = dog
+
+	app.render(w, "dog-of-month.page.gohtml", &templateData{Data: data})
 }
 
 func (app *application) CreateDogFromFactory(w http.ResponseWriter, r *http.Request) {
