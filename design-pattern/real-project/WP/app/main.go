@@ -22,8 +22,6 @@ func main() {
 
 	// Start the worker pool
 	wp.Run()
-	fmt.Println("Worker pool started. Press enter to continue.")
-	_, _ = fmt.Scanln()
 
 	// Create a video to send to the worker pool
 	video := wp.NewVideo(1, "./input/puppy1.mp4", "./output", "mp4", notifyChan, nil)
