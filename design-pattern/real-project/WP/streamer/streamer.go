@@ -72,7 +72,7 @@ func (v *Video) encode() {
 
 	switch v.EncodingType {
 	case "mp4":
-		fmt.Println("v.encode(): About to encode to mp4", v.ID)
+		// fmt.Println("v.encode(): About to encode to mp4", v.ID)
 		// encode the video
 		name, err := v.encodeToMP4()
 		if err != nil {
@@ -81,12 +81,21 @@ func (v *Video) encode() {
 			return
 		}
 		fileName = fmt.Sprintf("%s.mp4", name)
+	case "hls":
+		// encode the video
+		name, err := v.encodeToHLS()
+		if err != nil {
+			// send information to the notifyChan
+			v.sendToNotifyChan(false, "", fmt.Sprintf("encode failed for %d: %s", v.ID, err.Error()))
+			return
+		}
+		fileName = fmt.Sprintf("%s.m3u8", name)
 	default:
-		fmt.Println("v.encode(): error trying to encode video", v.ID)
+		// fmt.Println("v.encode(): error trying to encode video", v.ID)
 		v.sendToNotifyChan(false, "", fmt.Sprintf("error processing for %d: invalid encoding type", v.ID))
 		return
 	}
-	fmt.Println("v.encode(): sending success message for video id", v.ID, "to notifyChan")
+	// fmt.Println("v.encode(): sending success message for video id", v.ID, "to notifyChan")
 	v.sendToNotifyChan(true, fileName, fmt.Sprintf("video id %d processed and saved as %s", v.ID, fmt.Sprintf("%s/%s", v.OutputDir, fileName)))
 }
 
@@ -94,7 +103,7 @@ func (v *Video) encode() {
 // putting resulting file in the output directory specified in the receiver as v.OutputDir.
 func (v *Video) encodeToMP4() (string, error) {
 	baseFileName := ""
-	fmt.Println("v.encodeToMP4: about to try to encode video id", v.ID)
+	// fmt.Println("v.encodeToMP4: about to try to encode video id", v.ID)
 	if !v.Options.RenameOutput {
 		// Get the base file name.
 		b := path.Base(v.InputFile)
@@ -107,7 +116,25 @@ func (v *Video) encodeToMP4() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("v.encodeToMP4: successfully encoded video id", v.ID)
+	// fmt.Println("v.encodeToMP4: successfully encoded video id", v.ID)
+
+	return baseFileName, nil
+}
+
+func (v *Video) encodeToHLS() (string, error) {
+	baseFileName := ""
+	if !v.Options.RenameOutput {
+		// Get the base file name.
+		b := path.Base(v.InputFile)
+		baseFileName = strings.TrimSuffix(b, filepath.Ext(b))
+	} else {
+		// TODO: Generate random file name
+	}
+
+	err := v.Encoder.Engine.EncodeToHLS(v, baseFileName)
+	if err != nil {
+		return "", err
+	}
 
 	return baseFileName, nil
 }

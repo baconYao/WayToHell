@@ -24,7 +24,14 @@ func main() {
 	wp.Run()
 
 	// Create a video to send to the worker pool
-	video := wp.NewVideo(1, "./input/puppy1.mp4", "./output", "mp4", notifyChan, nil)
+	ops := &streamer.VideoOptions{
+		SegmentDuration: 10,
+		MaxRate1080p:    "1200k",
+		MaxRate720p:     "600k",
+		MaxRate480p:     "400k",
+	}
+	// video := wp.NewVideo(1, "./input/puppy1.mp4", "./output", "mp4", notifyChan, nil)
+	video := wp.NewVideo(1, "./input/puppy1.mp4", "./output", "hls", notifyChan, ops)
 
 	// Send the videos to the worker pool
 	videoQueue <- streamer.VideoProcessingJob{Video: video}
