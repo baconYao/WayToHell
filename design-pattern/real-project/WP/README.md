@@ -2,6 +2,8 @@
 
 WP is a video convertor which leverage the ffmpeg to help us transform video to MP4 or HLS format. This tool has been implemented with Worker Pool Patterns.
 
+Ref: https://github.com/tsawler/streamer/blob/main/.github/workflows/tests.yml
+
 ## Usage
 
 ```bash
