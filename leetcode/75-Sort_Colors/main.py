@@ -1,3 +1,7 @@
+# As the arrangement resembles the Dutch national flag,
+# the approach is commonly known as the Dutch National Flag algorithm
+
+
 class Solution:
     def sortColors(self, nums: List[int]) -> None:
         """
