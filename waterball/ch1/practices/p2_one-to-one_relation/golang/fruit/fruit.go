@@ -1,4 +1,4 @@
-package hero
+package fruit
 
 type Fruit struct{}
 

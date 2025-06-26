@@ -2,13 +2,15 @@ package hero
 
 import (
 	"fmt"
+	"hero-one-to-one/pet"
 )
 
+// Hero represents a character with level, experience, health points, and an optional pet.
 type Hero struct {
 	level    int
 	totalExp int
 	hp       int
-	pet      *Pet // Nullable pet field
+	pet      *pet.Pet
 }
 
 // NewHero creates a new Hero with default values.
@@ -21,32 +23,38 @@ func NewHero() *Hero {
 	}
 }
 
+// GainExp adds experience points and updates the level using the provided LevelSheet.
 func (h *Hero) GainExp(exp int, levelSheet LevelSheet) error {
 	if exp < 0 {
 		return fmt.Errorf("error: 無法獲得負數的經驗值 %d", exp)
 	}
 	currentLevel := h.getLevel()
 	h.setTotalExp(h.getTotalExp() + exp)
-	h.setLevel(levelSheet.QueryLevel((h.getTotalExp())))
+	h.setLevel(levelSheet.QueryLevel(h.getTotalExp()))
 	fmt.Printf("英雄目前等級 %d，獲得 %d EXP，最新總共經驗值為 %d，最新等級為 %d。\n", currentLevel, exp, h.getTotalExp(), h.getLevel())
 	return nil
 }
 
-func (h Hero) GetPet() *Pet {
+// GetPet returns the hero's pet, which may be nil.
+func (h *Hero) GetPet() *pet.Pet {
 	return h.pet
 }
 
-func (h *Hero) SetPet(pet *Pet) {
+// SetPet sets the hero's pet and updates the pet's owner.
+func (h *Hero) SetPet(pet *pet.Pet) {
 	if h.pet != nil {
-		h.pet.owner = nil
+		h.pet.SetOwner(nil)
 	}
 	h.pet = pet
-	pet.setOwner(h)
+	if pet != nil {
+		pet.SetOwner(h)
+	}
 }
 
+// RemovePet clears the hero's pet and its owner reference.
 func (h *Hero) RemovePet() {
 	if h.pet != nil {
-		h.pet.owner = nil
+		h.pet.SetOwner(nil)
 	}
 	h.pet = nil
 }
@@ -63,31 +71,33 @@ func (h *Hero) setTotalExp(totalExp int) error {
 // setLevel sets the level, ensuring it's non-negative.
 func (h *Hero) setLevel(level int) error {
 	if level < 0 {
-		return fmt.Errorf("Level must be greater than or equal to 0, got %d", level)
+		return fmt.Errorf("level must be greater than or equal to 0, got %d", level)
 	}
 	h.level = level
 	return nil
 }
 
-// setLevel sets the hp, ensuring it's non-negative.
-func (h *Hero) setHp(hp int) error {
+// SetHp sets the hp, ensuring it's non-negative.
+func (h *Hero) SetHp(hp int) error {
 	if hp < 0 {
 		return fmt.Errorf("HP must be greater than or equal to 0, got %d", hp)
 	}
 	h.hp = hp
-
 	fmt.Println("英雄血量更新至", hp)
 	return nil
 }
 
-func (h Hero) getTotalExp() int {
+// getTotalExp returns the total experience points.
+func (h *Hero) getTotalExp() int {
 	return h.totalExp
 }
 
-func (h Hero) getLevel() int {
+// getLevel returns the hero's current level.
+func (h *Hero) getLevel() int {
 	return h.level
 }
 
-func (h Hero) GetHp() int {
+// GetHp returns the hero's health points.
+func (h *Hero) GetHp() int {
 	return h.hp
 }
