@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -21,13 +22,30 @@ const (
 type Logger struct {
 	level  LogLevel
 	writer io.Writer
+	mu     sync.Mutex
 }
 
-// NewLogger creates a new Logger with the specified log level
-func NewLogger(level string) *Logger {
-	logger := &Logger{
-		writer: os.Stdout, // Default output to stdout
-	}
+var (
+	globalLogger *Logger
+	once         sync.Once
+)
+
+// GetLogger returns global logger instance
+func GetLogger() *Logger {
+	once.Do(func() {
+		globalLogger = &Logger{
+			level:  INFO,
+			writer: os.Stdout,
+		}
+	})
+	return globalLogger
+}
+
+// ConfigureLogger configs the global logger
+func ConfigureLogger(level string, writer io.Writer) {
+	logger := GetLogger()
+	logger.mu.Lock()
+	defer logger.mu.Unlock()
 
 	switch strings.ToUpper(level) {
 	case "DEBUG":
@@ -40,12 +58,9 @@ func NewLogger(level string) *Logger {
 		logger.level = INFO
 	}
 
-	return logger
-}
-
-// SetOutput sets the log output destination
-func (l *Logger) SetOutput(w io.Writer) {
-	l.writer = w
+	if writer != nil {
+		logger.writer = writer
+	}
 }
 
 // Debug logs a debug message
@@ -76,7 +91,10 @@ func (l *Logger) log(level, format string, args ...interface{}) {
 
 	// Get caller file and line number, skipping runtime-internal files
 	file, line := getCaller()
-	fmt.Fprintf(l.writer, "%s [%s] %s:%d %s\n", timestamp, level, file, line, message)
+	_, err := fmt.Fprintf(l.writer, "%s [%s] %s:%d %s\n", timestamp, level, file, line, message)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to write log: %v\n", err)
+	}
 }
 
 // getCaller retrieves the file name and line number of the caller, skipping runtime-internal files

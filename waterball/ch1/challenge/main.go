@@ -12,9 +12,9 @@ func main() {
 	flag.Parse()
 
 	// Create Logger with the specified log level
-	log := logger.NewLogger(*logLevel)
+	logger.ConfigureLogger(*logLevel, nil)
+	log := logger.GetLogger()
 
-	// Create four players
 	log.Debug("Creating four players...\n")
 	players := []showdown.Player{showdown.NewHumanPlayer(), showdown.NewAIPlayer(), showdown.NewAIPlayer(), showdown.NewAIPlayer()}
 	game, err := showdown.NewShowdown(players)
@@ -22,9 +22,15 @@ func main() {
 		log.Error("error creating Showdown: %v\n", err)
 		return
 	}
+	// Start showdown game
 	if err := game.Start(); err != nil {
 		log.Error("error: %v\n", err)
 		return
 	}
 
+	// Take turn
+	if err := game.TakeTurns(); err != nil {
+		log.Error("error: %v\n", err)
+		return
+	}
 }

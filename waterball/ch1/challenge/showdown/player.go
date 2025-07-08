@@ -2,7 +2,7 @@ package showdown
 
 import (
 	"errors"
-	"fmt"
+	"showdown/logger"
 )
 
 const MAXCARDS int = ROUNDS
@@ -15,29 +15,35 @@ type Player interface {
 	GetPoint() int
 	GetPrivilege() bool
 	SetPrivilege(p bool) error
+	GetCards() []Card
+	SetCards(cards []Card) error
+	ExchangeHands(switchBackIteration int) error
+	SetExchangedHand(eh *ExchangedHand) error
 	GetExchangedHand() *ExchangedHand
+	GetShowdown() *Showdown
+	SetShowdown(*Showdown) error
+	WantExchangeHands() (bool, error)
 	NameHimSelf() error
+	selectExchangeCandidate() (Player, error)
 }
 
 type BasePlayer struct {
+	showdown      *Showdown
 	name          []byte
 	point         int
 	cards         []Card
-	privilege     bool // the ability to perform exchange hand privilege
+	privilege     bool // the ability to perform exchange hand privilege. BasePlayer has the privilege to perform exchange action if ture, false otherwise
 	exchangedHand *ExchangedHand
-}
-
-func (bp *BasePlayer) Show() (Card, error) {
-	panic("NameHimSelf method must be implemented by concrete types")
 }
 
 // GainCard adds a card into players' hand
 func (bp *BasePlayer) GainCard(card Card) error {
+	log := logger.GetLogger()
 	if len(bp.cards) > MAXCARDS {
 		return errors.New("cannot gain cards: maximum card limit reached")
 	}
 	bp.cards = append(bp.cards, card)
-	fmt.Printf("Player %s gains a new card: %s-%s\n", bp.GetName(), card.GetSuit(), card.GetRank())
+	log.Debug("Player %s gains a new card: %s-%s\n", bp.GetName(), card.GetSuit(), card.GetRank())
 	return nil
 }
 
@@ -53,8 +59,16 @@ func (bp *BasePlayer) GainPoint(point int) error {
 	return nil
 }
 
-func (bp BasePlayer) NameHimSelf() error {
-	panic("NameHimSelf method must be implemented by concrete types")
+func (bp BasePlayer) GetShowdown() *Showdown {
+	return bp.showdown
+}
+
+func (bp *BasePlayer) SetShowdown(showdown *Showdown) error {
+	if showdown == nil {
+		return errors.New("player cannot join a non-existent game")
+	}
+	bp.showdown = showdown
+	return nil
 }
 
 func (bp BasePlayer) GetName() []byte {
@@ -69,6 +83,8 @@ func (bp *BasePlayer) setName(name []byte) error {
 	return nil
 }
 
+// GetPrivilege returns the privilege value.
+// true means the player has the privilege to perform exchange action, false otherwise
 func (bp BasePlayer) GetPrivilege() bool {
 	return bp.privilege
 }
@@ -78,8 +94,21 @@ func (bp *BasePlayer) SetPrivilege(p bool) error {
 	return nil
 }
 
-func exchangedHands(candidate BasePlayer, switchBackIteration int) (*ExchangedHand, error) {
-	return nil, nil
+func (bp BasePlayer) GetCards() []Card {
+	return append([]Card(nil), bp.cards...)
+}
+
+func (bp *BasePlayer) SetCards(cards []Card) error {
+	bp.cards = append([]Card(nil), cards...)
+	return nil
+}
+
+func (bp *BasePlayer) SetExchangedHand(eh *ExchangedHand) error {
+	if eh == nil {
+		return errors.New("cannot set to exchangedHand as nil")
+	}
+	bp.exchangedHand = eh
+	return nil
 }
 
 func (bp BasePlayer) GetExchangedHand() *ExchangedHand {
