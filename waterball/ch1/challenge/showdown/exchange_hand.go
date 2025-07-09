@@ -7,24 +7,24 @@ import (
 )
 
 type ExchangedHand struct {
-	swapBackIteration int
-	issuer            Player
-	candidate         Player
+	swapBackRound int
+	issuer        Player
+	candidate     Player
 }
 
-func NewExchangedHand(issuer, candidate Player, swapBackIteration int) (*ExchangedHand, error) {
+func NewExchangedHand(issuer, candidate Player, swapBackRound int) (*ExchangedHand, error) {
 	if issuer == nil || candidate == nil {
 		return nil, errors.New("issuer or candidate cannot be nil")
 	}
 
-	if swapBackIteration < 2 || swapBackIteration > ROUNDS {
+	if swapBackRound < 2 || swapBackRound > ROUNDS {
 		return nil, errors.New("invalid switch back iteration")
 	}
 
 	return &ExchangedHand{
-		swapBackIteration: swapBackIteration,
-		issuer:            issuer,
-		candidate:         candidate,
+		swapBackRound: swapBackRound,
+		issuer:        issuer,
+		candidate:     candidate,
 	}, nil
 }
 
@@ -57,8 +57,8 @@ func (e *ExchangedHand) Exchange() error {
 	return nil
 }
 
-func (e ExchangedHand) GetSwapBackIteration() int {
-	return e.swapBackIteration
+func (e ExchangedHand) GetswapBackRound() int {
+	return e.swapBackRound
 }
 
 func (e ExchangedHand) GetIssuer() Player {

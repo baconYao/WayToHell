@@ -72,7 +72,7 @@ func (s Showdown) TakeTurns() error {
 		showedCards := make(map[string]Card, 0)
 		for _, p := range s.players {
 			// swap card back if the exchangedHand exists and matchs the iteration
-			if p.GetExchangedHand() != nil && p.GetExchangedHand().GetSwapBackIteration() == r {
+			if p.GetExchangedHand() != nil && p.GetExchangedHand().GetswapBackRound() == r {
 				log.Info("Exchanging cards back...")
 				p.GetExchangedHand().Exchange()
 			}
@@ -158,10 +158,13 @@ func (s Showdown) compareCard(showedCards map[string]Card) (string, error) {
 
 // ShowWinner prints the final winner(s) who have the highest point
 func (s Showdown) ShowWinner() {
+	fmt.Println("******************************")
+	log := logger.GetLogger()
 	maxPoint := 0
 	var winners []Player
 
 	for _, p := range s.players {
+		log.Info("Player '%s' has %d point(s)", p.GetName(), p.GetPoint())
 		if p.GetPoint() > maxPoint {
 			// New highest point, reset winners
 			maxPoint = p.GetPoint()
@@ -173,12 +176,12 @@ func (s Showdown) ShowWinner() {
 	}
 
 	if len(winners) == 1 {
-		fmt.Printf("Winner: %s with %d points\n", winners[0].GetName(), maxPoint)
+		log.Info("Winner: %s with %d points\n", winners[0].GetName(), maxPoint)
 	} else {
 		names := make([]string, len(winners))
 		for i, p := range winners {
 			names[i] = string(p.GetName())
 		}
-		fmt.Printf("Tie: %s share %d points\n", strings.Join(names, " and "), maxPoint)
+		log.Info("Tie: %s share %d points\n", strings.Join(names, " and "), maxPoint)
 	}
 }
