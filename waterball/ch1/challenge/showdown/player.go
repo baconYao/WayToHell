@@ -13,8 +13,6 @@ type Player interface {
 	GetName() []byte
 	GainPoint(point int) error
 	GetPoint() int
-	GetPrivilege() bool
-	SetPrivilege(p bool) error
 	GetCards() []Card
 	SetCards(cards []Card) error
 	ExchangeHands(switchBackIteration int) error
@@ -32,7 +30,6 @@ type BasePlayer struct {
 	name          []byte
 	point         int
 	cards         []Card
-	privilege     bool // the ability to perform exchange hand privilege. BasePlayer has the privilege to perform exchange action if ture, false otherwise
 	exchangedHand *ExchangedHand
 }
 
@@ -55,7 +52,7 @@ func (bp *BasePlayer) GainPoint(point int) error {
 	if point < 1 {
 		return errors.New("cannot gain the negative point")
 	}
-	bp.point = point
+	bp.point = bp.point + point
 	return nil
 }
 
@@ -80,17 +77,6 @@ func (bp *BasePlayer) setName(name []byte) error {
 		return errors.New("name length must be between 4 and 8 characters")
 	}
 	bp.name = name
-	return nil
-}
-
-// GetPrivilege returns the privilege value.
-// true means the player has the privilege to perform exchange action, false otherwise
-func (bp BasePlayer) GetPrivilege() bool {
-	return bp.privilege
-}
-
-func (bp *BasePlayer) SetPrivilege(p bool) error {
-	bp.privilege = p
 	return nil
 }
 

@@ -2,17 +2,16 @@ package showdown
 
 import (
 	"fmt"
-	"showdown/logger"
 	"strings"
 )
 
-// PrintCards prints the cards in the format "Suit-Rank" using the custom logger
-func PrintCardsHelper(cards []Card) {
-	log := logger.GetLogger()
+// PrettyCardsHelper returns a string that shows cards in the format "Index: Suit-Rank"
+func PrettyCardsHelper(cards []Card) string {
+	// log := logger.GetLogger()
 	var output strings.Builder
 	for i, card := range cards {
 		if card.IsValid() {
-			output.WriteString(fmt.Sprintf("%s-%s", card.GetSuit().String(), card.GetRank().String()))
+			output.WriteString(fmt.Sprintf("%d: %s-%s", i, card.GetSuit().String(), card.GetRank().String()))
 		} else {
 			output.WriteString("Invalid card")
 		}
@@ -20,5 +19,6 @@ func PrintCardsHelper(cards []Card) {
 			output.WriteString(", ")
 		}
 	}
-	log.Debug("%s", output.String())
+	// log.Debug("%s", output.String())
+	return output.String()
 }

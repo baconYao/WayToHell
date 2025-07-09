@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"showdown/logger"
+	"strconv"
 	"strings"
 )
 
@@ -20,7 +21,6 @@ func NewHumanPlayer() *Human {
 		name:          nil,
 		point:         0,
 		cards:         make([]Card, 0),
-		privilege:     true,
 		exchangedHand: nil,
 	}}
 }
@@ -41,12 +41,50 @@ func (h *Human) NameHimSelf() error {
 }
 
 func (h *Human) Show() (Card, error) {
-	panic("Show method not be implemented yet")
+	log := logger.GetLogger()
+	cards := h.GetCards()
+
+	// Check if hand is empty
+	if len(cards) == 0 {
+		log.Info("No cards available to show")
+		return Card{}, fmt.Errorf("no cards available")
+	}
+
+	log.Info("Show a card, please enter the index from the following cards...")
+	log.Info("Cards: %s", PrettyCardsHelper(cards))
+
+	// Retry loop for valid input
+	scanner := bufio.NewScanner(os.Stdin)
+	for {
+		scanner.Scan()
+		input := strings.TrimSpace(scanner.Text())
+
+		index, err := strconv.Atoi(input)
+		if err != nil {
+			log.Info("Invalid input: please enter a number")
+			continue
+		}
+
+		if index < 0 || index >= len(cards) {
+			log.Info("Invalid index: please enter a number between 0 and %d", len(cards)-1)
+			continue
+		}
+
+		// Get selected card
+		selectedCard := cards[index]
+		log.Info("Selected card: %s-%s", selectedCard.GetSuit().String(), selectedCard.GetRank().String())
+
+		// Remove the selected card from the hand
+		newCards := append(cards[:index], cards[index+1:]...)
+		h.SetCards(newCards)
+
+		return selectedCard, nil
+	}
 }
 
 func (h *Human) ExchangeHands(switchBackIteration int) error {
 	log := logger.GetLogger()
-	if !h.GetPrivilege() && h.GetExchangedHand() != nil {
+	if h.GetExchangedHand() != nil {
 		return errors.New("cannot exchange hands again")
 	}
 
@@ -55,7 +93,7 @@ func (h *Human) ExchangeHands(switchBackIteration int) error {
 		return err
 	}
 
-	log.Info("Player '%s' exchanging hands with player '%s'", h.GetName(), candidate.GetName())
+	log.Debug("Player '%s' exchanging hands with player '%s'", h.GetName(), candidate.GetName())
 	eh, err := NewExchangedHand(h, candidate, switchBackIteration)
 	if err != nil {
 		return err
@@ -63,11 +101,6 @@ func (h *Human) ExchangeHands(switchBackIteration int) error {
 
 	h.SetExchangedHand(eh)
 	err = eh.Exchange()
-	if err != nil {
-		return err
-	}
-
-	err = h.SetPrivilege(false)
 	if err != nil {
 		return err
 	}

@@ -22,7 +22,7 @@ func NewExchangedHand(issuer, candidate Player, swapBackIteration int) (*Exchang
 	}
 
 	return &ExchangedHand{
-		swapBackIteration: 0,
+		swapBackIteration: swapBackIteration,
 		issuer:            issuer,
 		candidate:         candidate,
 	}, nil
@@ -31,33 +31,28 @@ func NewExchangedHand(issuer, candidate Player, swapBackIteration int) (*Exchang
 // Exchange swaps the hands card between issuer and candidate.
 func (e *ExchangedHand) Exchange() error {
 	log := logger.GetLogger()
-	log.Info("Starting card swap between issuer and candidate...")
+	log.Info("Exchanging cards between '%s' and '%s'...", e.issuer.GetName(), e.candidate.GetName())
 
 	issuerCards := e.issuer.GetCards()
-	log.Debug("Cards of issuer '%s'", e.issuer.GetName())
-	PrintCardsHelper(issuerCards)
+	log.Debug("Cards of issuer '%s' -> %s", e.issuer.GetName(), PrettyCardsHelper(issuerCards))
 
 	candidateCards := e.candidate.GetCards()
-	log.Debug("Cards of candidate '%s'", e.candidate.GetName())
-	PrintCardsHelper(candidateCards)
+	log.Debug("Cards of candidate '%s' -> %s", e.candidate.GetName(), PrettyCardsHelper(candidateCards))
 
 	if issuerCards == nil || candidateCards == nil {
-		return fmt.Errorf("cannot swap: one or both players have nil cards")
+		return fmt.Errorf("cannot exchnage: one or both players have nil cards")
 	}
 
-	log.Debug("Swaping...")
 	if err := e.issuer.SetCards(candidateCards); err != nil {
 		return fmt.Errorf("failed to set cards for issuer: %v", err)
 	}
-	log.Debug("After swaping, cards of issuer '%s'", e.issuer.GetName())
-	PrintCardsHelper(e.issuer.GetCards())
+	log.Debug("After exchanging, cards of issuer '%s' -> %s", e.issuer.GetName(), e.candidate.GetName())
 
-	log.Debug("After swaping, cards of candidate '%s'", e.candidate.GetName())
 	if err := e.candidate.SetCards(issuerCards); err != nil {
 
 		return fmt.Errorf("failed to set cards for candidate: %v", err)
 	}
-	PrintCardsHelper(e.candidate.GetCards())
+	log.Debug("After exchanging, cards of candidate '%s' -> %s", e.candidate.GetName(), PrettyCardsHelper(e.candidate.GetCards()))
 
 	return nil
 }

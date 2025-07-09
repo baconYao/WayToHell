@@ -33,4 +33,7 @@ func main() {
 		log.Error("error: %v\n", err)
 		return
 	}
+
+	// Print the final winner(s)
+	game.ShowWinner()
 }

@@ -3,6 +3,7 @@ package showdown
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"math/rand"
 	"showdown/logger"
 	"time"
@@ -18,7 +19,6 @@ func NewAIPlayer() *AI {
 		name:          nil,
 		point:         0,
 		cards:         make([]Card, 0),
-		privilege:     true,
 		exchangedHand: nil,
 	}}
 }
@@ -37,7 +37,28 @@ func (a *AI) NameHimSelf() error {
 }
 
 func (a *AI) Show() (Card, error) {
-	panic("Show method not be implemented yet")
+	log := logger.GetLogger()
+	cards := a.GetCards()
+
+	// Check if hand is empty
+	if len(cards) == 0 {
+		log.Info("No cards available to show")
+		return Card{}, fmt.Errorf("no cards available")
+	}
+
+	// Create a new random number generator
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	// Randomly select a card
+	index := rng.Intn(len(cards))
+	selectedCard := cards[index]
+	log.Debug("AI %s selected card: %s-%s", a.GetName(), selectedCard.GetSuit().String(), selectedCard.GetRank().String())
+
+	// Remove the selected card from the hand
+	newCards := append(cards[:index], cards[index+1:]...)
+	a.SetCards(newCards)
+
+	return selectedCard, nil
 }
 
 func (a *AI) WantExchangeHands() (bool, error) {
@@ -58,7 +79,7 @@ func (a *AI) WantExchangeHands() (bool, error) {
 
 func (a *AI) ExchangeHands(switchBackIteration int) error {
 	log := logger.GetLogger()
-	if !a.GetPrivilege() && a.GetExchangedHand() != nil {
+	if a.GetExchangedHand() != nil {
 		return errors.New("cannot exchange hands again")
 	}
 
@@ -76,11 +97,6 @@ func (a *AI) ExchangeHands(switchBackIteration int) error {
 
 	a.SetExchangedHand(eh)
 	err = eh.Exchange()
-	if err != nil {
-		return err
-	}
-
-	a.SetPrivilege(false)
 	if err != nil {
 		return err
 	}
