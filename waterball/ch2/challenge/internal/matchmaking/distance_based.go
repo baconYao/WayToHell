@@ -13,3 +13,8 @@ func NewDistanceBased() *DistanceBased {
 		logger: logger.GetLogger(),
 	}
 }
+
+func (d *DistanceBased) Match(matcher *Individual, matchee []*Individual) (*Individual, error) {
+	d.logger.Debug("Starting DistanceBased match")
+	return nil, nil
+}

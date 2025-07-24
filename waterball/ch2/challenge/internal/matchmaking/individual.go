@@ -13,6 +13,11 @@ const (
 	Female Gender = "FEMALE"
 )
 
+type Coord struct {
+	x int
+	y int
+}
+
 // Individual represents a participant in the matchmaking system
 type Individual struct {
 	ID     int      // Positive integer, unique
@@ -20,13 +25,10 @@ type Individual struct {
 	Age    int      // Must be >= 18
 	Intro  string   // 0-200 characters
 	Habits []string // List of habits
-	Coord  struct { // Coordinates (x, y)
-		X float64
-		Y float64
-	}
+	Coord  Coord
 }
 
-func NewIndividual(id int, gender Gender, age int, intro string, habits string, x, y float64) (*Individual, error) {
+func NewIndividual(id int, gender Gender, age int, intro string, habits string, x, y int) (*Individual, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("ID must be positive")
 	}
@@ -52,9 +54,30 @@ func NewIndividual(id int, gender Gender, age int, intro string, habits string, 
 		Age:    age,
 		Intro:  intro,
 		Habits: habitList,
-		Coord: struct {
-			X float64
-			Y float64
-		}{X: x, Y: y},
+		Coord:  Coord{x: x, y: y},
 	}, nil
+}
+
+func (i Individual) getID() int {
+	return i.ID
+}
+
+func (i Individual) getGender() Gender {
+	return i.Gender
+}
+
+func (i Individual) getAge() int {
+	return i.Age
+}
+
+func (i Individual) getIntro() string {
+	return i.Intro
+}
+
+func (i Individual) getHabits() []string {
+	return i.Habits
+}
+
+func (i Individual) getCoord() Coord {
+	return i.Coord
 }

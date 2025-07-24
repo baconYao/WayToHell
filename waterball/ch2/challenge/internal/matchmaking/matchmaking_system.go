@@ -15,7 +15,7 @@ type MatchmakingSystem struct {
 // NewMatchmakingSystem creates a new MatchmakingSystem instance
 func NewMatchmakingSystem(individuals []*Individual, matchType MatchType) (*MatchmakingSystem, error) {
 	if matchType == nil {
-		return nil, fmt.Errorf("Match type is not set")
+		return nil, fmt.Errorf("matchType is not set")
 	}
 
 	return &MatchmakingSystem{
@@ -25,11 +25,24 @@ func NewMatchmakingSystem(individuals []*Individual, matchType MatchType) (*Matc
 	}, nil
 }
 
-func (m MatchmakingSystem) Start() {
-	// TODO
+func (m MatchmakingSystem) Start() error {
+	m.logger.Debug("Start the Matchmaking System")
+	if len(m.individuals) < 2 {
+		m.logger.Error("There are currently '%d' participants, but at least two are required.", len(m.individuals))
+		return fmt.Errorf("not enough participants to form a match.")
+	}
+
+	for _, i := range m.individuals {
+		_, err := m.match(i)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (m *MatchmakingSystem) Match(matcher *Individual) (*Individual, error) {
+func (m *MatchmakingSystem) match(matcher *Individual) (*Individual, error) {
+	m.logger.Debug("Matching ID: '%d'...", matcher.getID())
 	return m.matchType.Match(matcher, m.individuals)
 }
 

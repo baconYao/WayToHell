@@ -4,4 +4,6 @@ test:
 	go test ./...
 run:
 	go run ./cmd/api
+dev:
+	go run ./cmd/api --log_level DEBUG
 	

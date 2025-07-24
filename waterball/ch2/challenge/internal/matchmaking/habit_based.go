@@ -13,3 +13,8 @@ func NewHabitBased() *DistanceBased {
 		logger: logger.GetLogger(),
 	}
 }
+
+func (h *HabitBased) Match(matcher *Individual, matchee []*Individual) (*Individual, error) {
+	h.logger.Debug("HabitBased Match...")
+	return nil, nil
+}
