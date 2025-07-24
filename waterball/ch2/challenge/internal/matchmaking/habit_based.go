@@ -14,7 +14,7 @@ func NewHabitBased() *DistanceBased {
 	}
 }
 
-func (h *HabitBased) Match(matcher *Individual, matchee []*Individual) (*Individual, error) {
+func (h *HabitBased) Match(matcher *Individual, matchees []*Individual) (*Individual, error) {
 	h.logger.Debug("HabitBased Match...")
 	return nil, nil
 }

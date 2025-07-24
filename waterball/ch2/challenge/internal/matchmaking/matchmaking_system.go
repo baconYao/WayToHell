@@ -26,17 +26,18 @@ func NewMatchmakingSystem(individuals []*Individual, matchType MatchType) (*Matc
 }
 
 func (m MatchmakingSystem) Start() error {
-	m.logger.Debug("Start the Matchmaking System")
+	m.logger.Info("Start the Matchmaking System")
 	if len(m.individuals) < 2 {
 		m.logger.Error("There are currently '%d' participants, but at least two are required.", len(m.individuals))
-		return fmt.Errorf("not enough participants to form a match.")
+		return fmt.Errorf("not enough participants to form a match")
 	}
 
 	for _, i := range m.individuals {
-		_, err := m.match(i)
+		matchee, err := m.match(i)
 		if err != nil {
 			return err
 		}
+		m.logger.Info("Matcher ID '%d' and Matchee ID '%d'", i.getID(), matchee.getID())
 	}
 	return nil
 }

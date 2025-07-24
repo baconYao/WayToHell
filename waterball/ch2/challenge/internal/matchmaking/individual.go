@@ -14,21 +14,30 @@ const (
 )
 
 type Coord struct {
-	x int
-	y int
+	X int
+	Y int
+}
+
+func (c Coord) getX() int {
+	return c.X
+}
+
+func (c Coord) getY() int {
+	return c.X
 }
 
 // Individual represents a participant in the matchmaking system
 type Individual struct {
-	ID     int      // Positive integer, unique
-	Gender Gender   // MALE or FEMALE
-	Age    int      // Must be >= 18
-	Intro  string   // 0-200 characters
-	Habits []string // List of habits
-	Coord  Coord
+	ID      int      // Positive integer, unique
+	Gender  Gender   // MALE or FEMALE
+	Age     int      // Must be >= 18
+	Intro   string   // 0-200 characters
+	Habits  []string // List of habits
+	Coord   Coord
+	Reverse bool
 }
 
-func NewIndividual(id int, gender Gender, age int, intro string, habits string, x, y int) (*Individual, error) {
+func NewIndividual(id int, gender Gender, age int, intro string, habits string, x, y int, reverse bool) (*Individual, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("ID must be positive")
 	}
@@ -48,13 +57,15 @@ func NewIndividual(id int, gender Gender, age int, intro string, habits string, 
 			return nil, fmt.Errorf("each habit must be 1-10 characters")
 		}
 	}
+
 	return &Individual{
-		ID:     id,
-		Gender: gender,
-		Age:    age,
-		Intro:  intro,
-		Habits: habitList,
-		Coord:  Coord{x: x, y: y},
+		ID:      id,
+		Gender:  gender,
+		Age:     age,
+		Intro:   intro,
+		Habits:  habitList,
+		Coord:   Coord{X: x, Y: y},
+		Reverse: reverse,
 	}, nil
 }
 
@@ -80,4 +91,8 @@ func (i Individual) getHabits() []string {
 
 func (i Individual) getCoord() Coord {
 	return i.Coord
+}
+
+func (i Individual) isUsingReverse() bool {
+	return i.Reverse
 }
