@@ -32,10 +32,14 @@ func (d *DistanceBased) Match(matcher *Individual, matchees []*Individual) (*Ind
 			}
 			dist := calculateDistance(matcherCoord, other.getCoord())
 			d.logger.Debug("Distance between ID %d and ID %d: %d", matcher.getID(), other.getID(), dist)
-			if dist <= closestDist {
+			if dist == closestDist {
 				if candidate == nil || other.getID() < candidate.getID() {
 					candidate = other
+					closestDist = dist
 				}
+			} else if dist < closestDist {
+				candidate = other
+				closestDist = dist
 			}
 		}
 	} else {
@@ -47,10 +51,14 @@ func (d *DistanceBased) Match(matcher *Individual, matchees []*Individual) (*Ind
 			}
 			dist := calculateDistance(matcherCoord, other.getCoord())
 			d.logger.Debug("Distance between ID %d and ID %d: %d", matcher.getID(), other.getID(), dist)
-			if dist >= closestDist {
+			if dist == closestDist {
 				if candidate == nil || other.getID() < candidate.getID() {
 					candidate = other
+					closestDist = dist
 				}
+			} else if dist > closestDist {
+				candidate = other
+				closestDist = dist
 			}
 		}
 	}
