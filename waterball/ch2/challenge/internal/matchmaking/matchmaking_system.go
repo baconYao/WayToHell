@@ -37,13 +37,13 @@ func (m MatchmakingSystem) Start() error {
 		if err != nil {
 			return err
 		}
-		m.logger.Info("Matcher ID '%d' and Matchee ID '%d'", i.getID(), matchee.getID())
+		m.logger.Info("Matcher ID '%d' (Reverse: %v) and Matchee ID '%d'", i.getID(), i.isUsingReverse(), matchee.getID())
 	}
 	return nil
 }
 
 func (m *MatchmakingSystem) match(matcher *Individual) (*Individual, error) {
-	m.logger.Debug("Matching ID: '%d'...", matcher.getID())
+	m.logger.Debug("Matching ID: '%d'", matcher.getID())
 	return m.matchType.Match(matcher, m.individuals)
 }
 
@@ -59,6 +59,6 @@ func (m MatchmakingSystem) getMatchType() MatchType {
 	return m.matchType
 }
 
-func (m *MatchmakingSystem) setMatchType(matchType MatchType) {
+func (m *MatchmakingSystem) SetMatchType(matchType MatchType) {
 	m.matchType = matchType
 }

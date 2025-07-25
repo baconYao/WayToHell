@@ -2,14 +2,26 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"matchmaking-system/internal/matchmaking"
 	"matchmaking-system/pkg/logger"
+	"os"
 )
 
 func main() {
 	// Define command-line flag for log level, default is INFO
 	logLevel := flag.String("log_level", "INFO", "Log level: DEBUG, INFO, ERROR")
+	matchStrategy := flag.String("match_strategy", "distance", "Match Strategy: distance, habit")
 	flag.Parse()
+
+	validStrategies := map[string]bool{
+		"distance": true,
+		"habit":    true,
+	}
+	if !validStrategies[*matchStrategy] {
+		fmt.Fprintf(os.Stderr, "Error: Invalid match_strategy '%s'. Must be one of: distance, habit\n", *matchStrategy)
+		os.Exit(1)
+	}
 
 	// Create Logger with the specified log level
 	logger.ConfigureLogger(*logLevel, nil)
@@ -31,7 +43,7 @@ func main() {
 			Gender:  matchmaking.Female,
 			Age:     22,
 			Intro:   "Enjoy reading",
-			Habits:  []string{"cooking", "reading"},
+			Habits:  []string{"cooking", "reading", "painting"},
 			Coord:   matchmaking.Coord{X: 11, Y: 21},
 			Reverse: false,
 		},
@@ -40,8 +52,26 @@ func main() {
 			Gender:  matchmaking.Male,
 			Age:     30,
 			Intro:   "Tech enthusiast",
-			Habits:  []string{"gaming", "reading"},
+			Habits:  []string{"gaming", "reading", "coding", "painting"},
 			Coord:   matchmaking.Coord{X: 15, Y: 25},
+			Reverse: false,
+		},
+		{
+			ID:      4,
+			Gender:  matchmaking.Male,
+			Age:     19,
+			Intro:   "Music Plyer",
+			Habits:  []string{"music", "piano", "guitar", "drum"},
+			Coord:   matchmaking.Coord{X: 7, Y: 3},
+			Reverse: true, // Prefer Reverse
+		},
+		{
+			ID:      5,
+			Gender:  matchmaking.Female,
+			Age:     22,
+			Intro:   "Band vocalist",
+			Habits:  []string{"music", "guitar", "sing"},
+			Coord:   matchmaking.Coord{X: 8, Y: 2},
 			Reverse: false,
 		},
 	}
@@ -52,6 +82,10 @@ func main() {
 	}
 
 	matchmakingSystem, err := matchmaking.NewMatchmakingSystem(individuals, matchmaking.NewDistanceBased())
+	if *matchStrategy == "habit" {
+		// Dynamic adjust match strategy by setter
+		matchmakingSystem.SetMatchType(matchmaking.NewHabitBased())
+	}
 	if err != nil {
 		log.Error("error creating Matchmaking System: %v\n", err)
 		return

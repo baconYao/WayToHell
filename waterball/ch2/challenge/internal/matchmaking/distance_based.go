@@ -33,13 +33,13 @@ func (d *DistanceBased) Match(matcher *Individual, matchees []*Individual) (*Ind
 			dist := calculateDistance(matcherCoord, other.getCoord())
 			d.logger.Debug("Distance between ID %d and ID %d: %d", matcher.getID(), other.getID(), dist)
 			if dist <= closestDist {
-				if candidate == nil || candidate.getID() > other.getID() {
+				if candidate == nil || other.getID() < candidate.getID() {
 					candidate = other
 				}
 			}
 		}
 	} else {
-		d.logger.Info("Macther is using reverse strategy, matching the farthest one...")
+		d.logger.Debug("Macther is using reverse strategy, matching the farthest one...")
 		closestDist := -1
 		for _, other := range matchees {
 			if other.getID() == matcher.getID() {
@@ -48,7 +48,7 @@ func (d *DistanceBased) Match(matcher *Individual, matchees []*Individual) (*Ind
 			dist := calculateDistance(matcherCoord, other.getCoord())
 			d.logger.Debug("Distance between ID %d and ID %d: %d", matcher.getID(), other.getID(), dist)
 			if dist >= closestDist {
-				if candidate == nil || candidate.getID() > other.getID() {
+				if candidate == nil || other.getID() < candidate.getID() {
 					candidate = other
 				}
 			}
