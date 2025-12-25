@@ -106,3 +106,51 @@ func Flatten3(root *TreeNode) {
 	root.Right = root.Left
 	root.Left = nil
 }
+
+// ===========================================
+// Morris 遍歷, O(1) 空間解法：尋找前驅節點 (Predecessor)
+func Flatten4(root *TreeNode) {
+	curr := root
+	for curr != nil {
+		if curr.Left != nil {
+			predecessor := curr.Left
+			for predecessor.Right != nil {
+				predecessor = predecessor.Right
+			}
+
+			predecessor.Right = curr.Right
+			curr.Right = curr.Left
+			curr.Left = nil
+		}
+		curr = curr.Right
+	}
+}
+
+// ===========================================
+// 時間複雜度：O(n)，其中 n 是二元樹的節點總數，因為每個節點都會被訪問一次。
+// 空間複雜度：O(h)，其中 h 是樹的高度，主要消耗在遞迴的系統棧空間。在最壞情況下（樹呈線性），空間複雜度為 O(n)。
+func Flatten5(root *TreeNode) {
+	var prev *TreeNode
+
+	// 定義一個內部遞迴函數
+	var helper func(*TreeNode)
+	helper = func(node *TreeNode) {
+		if node == nil {
+			return
+		}
+
+		// 1. 先處理右子樹
+		helper(node.Right)
+		// 2. 再處理左子樹
+		helper(node.Left)
+
+		// 3. 核心操作：將當前節點轉換為鏈表節點
+		node.Right = prev
+		node.Left = nil
+
+		// 4. 更新 prev，讓下一個節點可以接到當前節點上
+		prev = node
+	}
+
+	helper(root)
+}
