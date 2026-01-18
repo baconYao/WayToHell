@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/baconYao/WayToHell/waterball/ch3/go/cardkit/internal/card"
+	"cardkit/internal/card"
 )
 
 type Deck struct {

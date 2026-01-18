@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/baconYao/WayToHell/waterball/ch3/go/cardkit/internal/card"
-	"github.com/baconYao/WayToHell/waterball/ch3/go/cardkit/internal/hand"
+	"cardkit/internal/card"
+	"cardkit/internal/hand"
 )
 
 type Player struct {
@@ -71,7 +71,7 @@ func AISelectName() string {
 
 // HumanSelectName is a method to ask user to input a name for the human player
 func HumanSelectName() string {
-	fmt.Println("Please give a name for this human player, the name must be between 3 and 5 characters")
+	fmt.Println("請設定該人類玩家名稱, 名稱必須在 3 到 5 個字元之間")
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	input := strings.TrimSpace(scanner.Text())
@@ -91,12 +91,12 @@ func HumanSelectCard(handCards []card.Card) (card.Card, int) {
 		return nil, -1
 	}
 	// print the hand cards
-	fmt.Println("Your hand cards:")
+	fmt.Println("你的手牌如下:")
 	for i, card := range handCards {
 		fmt.Printf("%d. %s\n", i+1, card.ToString())
 	}
 	// ask the player to select a card to play
-	fmt.Println("Please select a card to play")
+	fmt.Println("請選擇一張牌出牌")
 	// Retry loop for valid input
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
@@ -104,11 +104,11 @@ func HumanSelectCard(handCards []card.Card) (card.Card, int) {
 		input := strings.TrimSpace(scanner.Text())
 		index, err := strconv.Atoi(input)
 		if err != nil {
-			fmt.Println("Invalid input")
+			fmt.Println("無效的輸入")
 			continue
 		}
 		if index < 1 || index > len(handCards) {
-			fmt.Println("Please select a card between 1 and", len(handCards))
+			fmt.Println("請選擇 1 到", len(handCards), "之間的牌")
 			continue
 		}
 		card := handCards[index-1]

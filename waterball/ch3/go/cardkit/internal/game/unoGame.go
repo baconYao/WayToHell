@@ -3,8 +3,9 @@ package game
 import (
 	"fmt"
 
-	"github.com/baconYao/WayToHell/waterball/ch3/go/cardkit/internal/deck"
-	"github.com/baconYao/WayToHell/waterball/ch3/go/cardkit/internal/player"
+	"cardkit/internal/deck"
+	"cardkit/internal/player"
+	"cardkit/pkg/logger"
 )
 
 type UnoGame struct {
@@ -14,6 +15,7 @@ type UnoGame struct {
 func NewUnoGame() *CardGameTemplate[bool] {
 	unoGame := &UnoGame{}
 	template := &CardGameTemplate[bool]{
+		logger:  logger.GetLogger(),
 		Game:    unoGame,
 		Players: make([]*player.Player, 0),
 		Deck:    deck.NewUnoDeck(),
@@ -30,13 +32,6 @@ func (u *UnoGame) setupPlayers() {
 	const requiredPlayers = 4
 	aiCount, humanCount := askPlayerCount(requiredPlayers)
 
-	// 驗證總數
-	totalPlayers := aiCount + humanCount
-	if totalPlayers != requiredPlayers {
-		fmt.Printf("玩家總數必須為 %d 位，目前為 %d 位（AI: %d, Human: %d）\n", requiredPlayers, totalPlayers, aiCount, humanCount)
-		return
-	}
-
 	// 創建 AI 玩家
 	for i := 0; i < aiCount; i++ {
 		aiPlayer := player.NewAIUnoPlayer()
@@ -46,11 +41,13 @@ func (u *UnoGame) setupPlayers() {
 
 	// 創建 Human 玩家
 	for i := 0; i < humanCount; i++ {
+		fmt.Printf("請設定第 %d 位 Human 玩家名稱\n", i+1)
 		humanPlayer := player.NewHumanUnoPlayer()
 		humanPlayer.NameHimself()
 		u.CardGameTemplate.AddPlayer(&humanPlayer.Player)
 	}
 
+	u.CardGameTemplate.showPlayers()
 	// Dispacth cards to players
 	dealCards(u.CardGameTemplate.Players, u.CardGameTemplate.Deck, 5)
 }

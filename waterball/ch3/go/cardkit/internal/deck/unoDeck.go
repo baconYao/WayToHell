@@ -1,6 +1,6 @@
 package deck
 
-import "github.com/baconYao/WayToHell/waterball/ch3/go/cardkit/internal/card"
+import "cardkit/internal/card"
 
 func NewUnoDeck() *Deck {
 	cards := make([]card.Card, 0, 40)

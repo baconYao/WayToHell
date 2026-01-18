@@ -3,7 +3,7 @@ package hand
 import (
 	"errors"
 
-	"github.com/baconYao/WayToHell/waterball/ch3/go/cardkit/internal/card"
+	"cardkit/internal/card"
 )
 
 type Hand struct {

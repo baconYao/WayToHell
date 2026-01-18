@@ -1,23 +1,26 @@
 package game
 
 import (
+	"cardkit/internal/deck"
+	"cardkit/internal/player"
+	"cardkit/pkg/logger"
 	"fmt"
-
-	"github.com/baconYao/WayToHell/waterball/ch3/go/cardkit/internal/deck"
-	"github.com/baconYao/WayToHell/waterball/ch3/go/cardkit/internal/player"
 )
 
 type ShowdownGame struct {
 	// Bidirectional reference to the template, able to access the Players, Deck and its methods...
 	CardGameTemplate *CardGameTemplate[struct{}]
-	Rounds           int
+	rounds           int
+	currentRound     int
 }
 
 func NewShowdownGame() *CardGameTemplate[struct{}] {
 	showdownGame := &ShowdownGame{
-		Rounds: 13,
+		rounds:       13,
+		currentRound: 1,
 	}
 	template := &CardGameTemplate[struct{}]{
+		logger:  logger.GetLogger(),
 		Game:    showdownGame,
 		Players: nil,
 		Deck:    deck.NewShowdownDeck(),
@@ -34,13 +37,6 @@ func (s *ShowdownGame) setupPlayers() {
 	const requiredPlayers = 4
 	aiCount, humanCount := askPlayerCount(requiredPlayers)
 
-	// 驗證總數
-	totalPlayers := aiCount + humanCount
-	if totalPlayers != requiredPlayers {
-		fmt.Printf("玩家總數必須為 %d 位，目前為 %d 位（AI: %d, Human: %d）\n", requiredPlayers, totalPlayers, aiCount, humanCount)
-		return
-	}
-
 	// 創建 AI 玩家
 	for i := 0; i < aiCount; i++ {
 		aiPlayer := player.NewAIShowdownPlayer()
@@ -50,13 +46,15 @@ func (s *ShowdownGame) setupPlayers() {
 
 	// 創建 Human 玩家
 	for i := 0; i < humanCount; i++ {
+		fmt.Printf("請設定第 %d 位 Human 玩家名稱\n", i+1)
 		humanPlayer := player.NewHumanShowdownPlayer()
 		humanPlayer.NameHimself()
 		s.CardGameTemplate.AddPlayer(&humanPlayer.Player)
 	}
 
+	s.CardGameTemplate.showPlayers()
 	// Dispacth cards to players
-	dealCards(s.CardGameTemplate.Players, s.CardGameTemplate.Deck, s.Rounds)
+	dealCards(s.CardGameTemplate.Players, s.CardGameTemplate.Deck, s.rounds)
 }
 
 func (s *ShowdownGame) takeTurn() {
@@ -64,11 +62,24 @@ func (s *ShowdownGame) takeTurn() {
 }
 
 func (s *ShowdownGame) isGameOver() bool {
+	s.CardGameTemplate.logger.Debug("檢查是否遊戲結束...")
+	if s.currentRound > s.rounds {
+		return true
+	}
 	return false
 }
 
 func (s *ShowdownGame) showWinner() {
-	// TODO: Implement this method
+	s.CardGameTemplate.logger.Debug("顯示贏家...")
+	players := s.CardGameTemplate.GetPlayers()
+	winner := players[0]
+	for idx, player := range players {
+		fmt.Printf("玩家%d: %s, 得分: %d\n", idx+1, player.GetName(), player.GetPoints())
+		if player.GetPoints() > winner.GetPoints() {
+			winner = player
+		}
+	}
+	fmt.Printf("贏家是: %s\n", winner.GetName())
 }
 
 func (s *ShowdownGame) compare() struct{} {

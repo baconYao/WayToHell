@@ -1,8 +1,8 @@
 package player
 
 import (
-	"github.com/baconYao/WayToHell/waterball/ch3/go/cardkit/internal/card"
-	"github.com/baconYao/WayToHell/waterball/ch3/go/cardkit/internal/hand"
+	"cardkit/internal/card"
+	"cardkit/internal/hand"
 )
 
 type UnoPlayer struct {
