@@ -10,15 +10,17 @@ import (
 
 type UnoGame struct {
 	CardGameTemplate *CardGameTemplate[bool]
+	unoPlayers       []*player.UnoPlayer
 }
 
 func NewUnoGame() *CardGameTemplate[bool] {
-	unoGame := &UnoGame{}
+	unoGame := &UnoGame{
+		unoPlayers: make([]*player.UnoPlayer, 0),
+	}
 	template := &CardGameTemplate[bool]{
-		logger:  logger.GetLogger(),
-		Game:    unoGame,
-		Players: make([]*player.Player, 0),
-		Deck:    deck.NewUnoDeck(),
+		logger: logger.GetLogger(),
+		Game:   unoGame,
+		Deck:   deck.NewUnoDeck(),
 	}
 	unoGame.CardGameTemplate = template
 	return template
@@ -28,28 +30,32 @@ func (u *UnoGame) setup() {
 	u.CardGameTemplate.Deck.Shuffle()
 }
 
+func (u *UnoGame) AddUnoPlayer(player *player.UnoPlayer) {
+	u.unoPlayers = append(u.unoPlayers, player)
+}
+
 func (u *UnoGame) setupPlayers() {
 	const requiredPlayers = 4
 	aiCount, humanCount := askPlayerCount(requiredPlayers)
 
 	// 創建 AI 玩家
 	for i := 0; i < aiCount; i++ {
-		aiPlayer := player.NewAIUnoPlayer()
-		aiPlayer.NameHimself()
-		u.CardGameTemplate.AddPlayer(&aiPlayer.Player)
+		aiPlayer := player.NewUnoPlayer(&player.AIStrategy{})
+		aiPlayer.NameHimSelf()
+		u.AddUnoPlayer(aiPlayer)
 	}
 
 	// 創建 Human 玩家
 	for i := 0; i < humanCount; i++ {
 		fmt.Printf("請設定第 %d 位 Human 玩家名稱\n", i+1)
-		humanPlayer := player.NewHumanUnoPlayer()
-		humanPlayer.NameHimself()
-		u.CardGameTemplate.AddPlayer(&humanPlayer.Player)
+		humanPlayer := player.NewUnoPlayer(&player.HumanStrategy{})
+		humanPlayer.NameHimSelf()
+		u.AddUnoPlayer(humanPlayer)
 	}
 
-	u.CardGameTemplate.showPlayers()
+	// u.CardGameTemplate.showPlayers()
 	// Dispacth cards to players
-	dealCards(u.CardGameTemplate.Players, u.CardGameTemplate.Deck, 5)
+	// dealCards(u.CardGameTemplate.Players, u.CardGameTemplate.Deck, 5)
 }
 
 func (u *UnoGame) beforeTakeTurn() {
