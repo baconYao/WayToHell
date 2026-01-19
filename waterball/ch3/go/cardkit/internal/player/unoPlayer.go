@@ -2,11 +2,10 @@ package player
 
 import (
 	"cardkit/internal/card"
-	"cardkit/internal/hand"
 )
 
 type UnoPlayer struct {
-	BasePlayer
+	BasePlayer[card.UnoCard]
 }
 
 type AIUnoPlayer struct {
@@ -15,10 +14,7 @@ type AIUnoPlayer struct {
 
 func NewUnoPlayer(playerBehaviorStrategy PlayerBehaviorStrategy) *UnoPlayer {
 	return &UnoPlayer{
-		BasePlayer: BasePlayer{
-			hand:             &hand.Hand{Cards: make([]card.Card, 0)},
-			behaviorStrategy: playerBehaviorStrategy,
-		},
+		BasePlayer: NewBasePlayer[card.UnoCard](playerBehaviorStrategy),
 	}
 }
 

@@ -74,21 +74,29 @@ func (s *HumanStrategy) DecideCard(handCards []card.Card) int {
 	}
 }
 
-type BasePlayer struct {
+// T 必須實作 card.Card 介面
+type BasePlayer[T card.Card] struct {
 	name             string
 	hand             *hand.Hand
 	behaviorStrategy PlayerBehaviorStrategy
 }
 
-func (b *BasePlayer) AddHandCard(c card.Card) {
+func NewBasePlayer[T card.Card](behaviorStrategy PlayerBehaviorStrategy) BasePlayer[T] {
+	return BasePlayer[T]{
+		hand:             &hand.Hand{Cards: make([]card.Card, 0)},
+		behaviorStrategy: behaviorStrategy,
+	}
+}
+
+func (b *BasePlayer[T]) AddHandCard(c card.Card) {
 	b.hand.Add(c)
 }
 
-func (b *BasePlayer) GetHandCards() []card.Card {
+func (b *BasePlayer[T]) GetHandCards() []card.Card {
 	return b.hand.GetCards()
 }
 
-func (b *BasePlayer) RemoveHandCard(index int) {
+func (b *BasePlayer[T]) RemoveHandCard(index int) {
 	err := b.hand.Remove(index)
 	if err != nil {
 		fmt.Println(err)
@@ -96,19 +104,22 @@ func (b *BasePlayer) RemoveHandCard(index int) {
 }
 
 // PlayCard is a placeholder (abstract method) for the subclass to implement
-func (b *BasePlayer) PlayCard() card.Card {
+func (b *BasePlayer[T]) PlayCard() T {
 	cards := b.hand.GetCards()
 	index := b.behaviorStrategy.DecideCard(cards)
 	if index < 0 || index >= len(cards) {
-		return nil
+		// 回傳 T 的零值
+		var zero T
+		return zero
 	}
-	card := cards[index]
+	chosenCard := cards[index]
 	b.hand.Remove(index)
-	return card
+	// 在 New 時保證了傳入的會是 T，將 card.Card 轉回具體的 T
+	return chosenCard.(T)
 }
 
 // NameHimSelf is a placeholder (abstract method) for the subclass to implement
-func (b *BasePlayer) NameHimSelf() {
+func (b *BasePlayer[T]) NameHimSelf() {
 	name := b.behaviorStrategy.DecideName()
 	for b.SetName(name) != nil {
 		// 如果名稱不合法（針對真人），就重新要求再次輸入名稱
@@ -116,7 +127,7 @@ func (b *BasePlayer) NameHimSelf() {
 	}
 }
 
-func (b *BasePlayer) SetName(name string) error {
+func (b *BasePlayer[T]) SetName(name string) error {
 	if len(name) < 3 || len(name) > 5 {
 		return errors.New("name must be between 3 and 5 characters")
 	}
@@ -124,43 +135,6 @@ func (b *BasePlayer) SetName(name string) error {
 	return nil
 }
 
-func (b *BasePlayer) GetName() string {
+func (b *BasePlayer[T]) GetName() string {
 	return b.name
-}
-
-// AskPlayerCount asks and returns the number of AI 和 Human Players
-// requiredPlayers: total players required is this game
-// Returns: aiCount, humanCount
-func AskPlayerCount(requiredPlayers int) (aiCount, humanCount int) {
-	fmt.Printf("此遊戲需要 %d 位玩家。\n", requiredPlayers)
-
-	scanner := bufio.NewScanner(os.Stdin)
-
-	// 詢問 AI 玩家數量
-	for {
-		fmt.Print("請輸入要幾位 AI 玩家: ")
-		scanner.Scan()
-		input := strings.TrimSpace(scanner.Text())
-		count, err := strconv.Atoi(input)
-		if err != nil {
-			fmt.Println("無效的輸入，請輸入數字")
-			continue
-		}
-		if count < 0 {
-			fmt.Println("AI 玩家數量不能為負數")
-			continue
-		}
-		if count > requiredPlayers {
-			fmt.Printf("AI 玩家數量不能超過 %d 位\n", requiredPlayers)
-			continue
-		}
-		aiCount = count
-		break
-	}
-
-	humanCount = requiredPlayers - aiCount
-
-	fmt.Printf("AI 玩家數量: %d, Human 玩家數量: %d\n", aiCount, humanCount)
-
-	return aiCount, humanCount
 }

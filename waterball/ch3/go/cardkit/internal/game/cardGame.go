@@ -2,8 +2,6 @@ package game
 
 import (
 	"bufio"
-	"cardkit/internal/deck"
-	"cardkit/internal/player"
 	"cardkit/pkg/logger"
 	"fmt"
 	"os"
@@ -31,19 +29,6 @@ func NewCardGame(strategy CardGameStrategy) *CardGame {
 func (c *CardGame) Start() {
 	c.logger.Info("Starting the game...")
 	c.game.Start()
-}
-
-// dispatchCards deals cards to all players
-// players: list of players to deal cards to
-// deck: the deck to draw cards from
-// rounds: number of rounds to deal (each round gives one card to each player)
-func dispatchCards(players []*player.BasePlayer, deck *deck.Deck, rounds int) {
-	fmt.Printf("為 %d 位玩家各發放 %d 張起始手牌\n", len(players), rounds)
-	for i := 0; i < rounds; i++ {
-		for _, player := range players {
-			player.AddHandCard(deck.Draw())
-		}
-	}
 }
 
 // askPlayerCount asks and returns the number of AI 和 Human Players

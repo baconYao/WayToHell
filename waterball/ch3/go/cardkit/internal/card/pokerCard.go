@@ -54,3 +54,11 @@ func (c PokerCard) ToString() string {
 
 	return fmt.Sprintf("[%s %s]", suitName[c.Suit], rName)
 }
+
+func (c PokerCard) GetRank() Rank {
+	return c.Rank
+}
+
+func (c PokerCard) GetSuit() Suit {
+	return c.Suit
+}
