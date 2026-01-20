@@ -4,8 +4,8 @@ import (
 	"cardkit/internal/card"
 )
 
-func NewShowdownDeck() *Deck {
-	cards := make([]card.Card, 0, 52)
+func NewShowdownDeck() *Deck[card.PokerCard] {
+	cards := make([]card.PokerCard, 0, 52)
 
 	suits := []card.Suit{card.Club, card.Diamond, card.Heart, card.Spade}
 	ranks := []card.Rank{
@@ -23,7 +23,7 @@ func NewShowdownDeck() *Deck {
 		}
 	}
 
-	return &Deck{
+	return &Deck[card.PokerCard]{
 		Cards: cards,
 	}
 }

@@ -7,24 +7,25 @@ import (
 	"cardkit/internal/card"
 )
 
-type Deck struct {
-	Cards []card.Card
+type Deck[T card.Card] struct {
+	Cards []T
 }
 
-func (d *Deck) Shuffle() {
+func (d *Deck[T]) Shuffle() {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	r.Shuffle(len(d.Cards), func(i, j int) {
 		d.Cards[i], d.Cards[j] = d.Cards[j], d.Cards[i]
 	})
 }
 
-func (d *Deck) IsEmpty() bool {
+func (d *Deck[T]) IsEmpty() bool {
 	return len(d.Cards) == 0
 }
 
-func (d *Deck) Draw() card.Card {
+func (d *Deck[T]) Draw() T {
 	if d.IsEmpty() {
-		return nil
+		var zero T
+		return zero
 	}
 
 	card := d.Cards[0]
@@ -32,7 +33,7 @@ func (d *Deck) Draw() card.Card {
 	return card
 }
 
-func (d *Deck) Refill(cards []card.Card) {
+func (d *Deck[T]) Refill(cards []T) {
 	if len(cards) == 0 {
 		return
 	}

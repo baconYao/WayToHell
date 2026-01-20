@@ -1,38 +1,34 @@
 package game
 
 import (
-	"cardkit/internal/deck"
 	"cardkit/pkg/logger"
 )
 
-type GameInterface[T any] interface {
+type GameInterface interface {
 	setup()
-	beforeTakeTurn()
+	// beforeTakeTurn()
 	takeTurn()
-	afterTakeTurn()
+	// afterTakeTurn()
 	isGameOver() bool
 	showWinner()
-	compare() T
 }
 
-type CardGameTemplate[T any] struct {
+type CardGameTemplate struct {
 	logger *logger.Logger
-	Deck   *deck.Deck
-	Game   GameInterface[T]
+	Game   GameInterface
 }
 
 // Start 是核心 Template Method。其執行邏輯遵循 OOD 中粉紅色便條紙的定義:
 // 1. Setup
 // 2. 迴圈執行 TakeTurn，進行 Compare 直到 GameOver
 // 3. ShowWinner
-func (c *CardGameTemplate[T]) Start() {
+func (c *CardGameTemplate) Start() {
 	c.logger.Debug("開始進行遊戲...")
 	c.Game.setup()
 	for !c.Game.isGameOver() {
-		c.Game.beforeTakeTurn()
-		c.Game.takeTurn()
-		c.Game.compare()
-		c.Game.afterTakeTurn()
+		// c.Game.beforeTakeTurn() // 每回合的前處理
+		c.Game.takeTurn() // 每回合的主要邏輯處理
+		// c.Game.afterTakeTurn()  // 每回合的後處理
 	}
 	c.Game.showWinner()
 }

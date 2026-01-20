@@ -10,24 +10,27 @@ import (
 
 type ShowdownGame struct {
 	// Bidirectional reference to the template, able to access the Players, Deck and its methods...
-	CardGameTemplate *CardGameTemplate[struct{}]
-	rounds           int
+	CardGameTemplate *CardGameTemplate
 	currentRound     int
+	deck             *deck.Deck[card.PokerCard]
+	requiredPlayers  int
+	rounds           int
 	showdownPlayers  []*player.ShowdownPlayer
-	tableCards       []card.PokerCard
+	tableCards       []card.PokerCard // 桌上牌堆, 用來保存每回合打出來的牌
 }
 
-func NewShowdownGame() *CardGameTemplate[struct{}] {
+func NewShowdownGame() *CardGameTemplate {
 	showdownGame := &ShowdownGame{
-		rounds:          13,
 		currentRound:    1,
+		deck:            deck.NewShowdownDeck(),
+		requiredPlayers: 4,
+		rounds:          13,
 		showdownPlayers: make([]*player.ShowdownPlayer, 0),
 		tableCards:      make([]card.PokerCard, 0),
 	}
-	template := &CardGameTemplate[struct{}]{
+	template := &CardGameTemplate{
 		logger: logger.GetLogger(),
 		Game:   showdownGame,
-		Deck:   deck.NewShowdownDeck(),
 	}
 	showdownGame.CardGameTemplate = template
 	return template
@@ -42,7 +45,9 @@ func (s *ShowdownGame) addTableCard(card card.PokerCard) {
 }
 
 func (s *ShowdownGame) getTableCards() []card.PokerCard {
-	return s.tableCards
+	replica := make([]card.PokerCard, len(s.tableCards))
+	copy(replica, s.tableCards[:len(s.tableCards)-1])
+	return replica
 }
 
 func (s *ShowdownGame) clearTableCards() {
@@ -50,29 +55,28 @@ func (s *ShowdownGame) clearTableCards() {
 }
 
 func (s *ShowdownGame) setup() {
-	const requiredPlayers = 4
-	aiCount, humanCount := askPlayerCount(requiredPlayers)
+	aiCount, humanCount := askPlayerCount(s.requiredPlayers)
 
 	// 創建 AI 玩家
 	for i := 0; i < aiCount; i++ {
-		aiPlayer := player.NewShowdownPlayer(&player.AIStrategy{})
+		aiPlayer := player.NewShowdownPlayer(&player.AIStrategy[card.PokerCard]{})
 		aiPlayer.NameHimSelf()
 		s.addShowdownPlayer(aiPlayer)
 	}
 
 	// 創建 Human 玩家
 	for i := 0; i < humanCount; i++ {
-		humanPlayer := player.NewShowdownPlayer(&player.HumanStrategy{})
+		humanPlayer := player.NewShowdownPlayer(&player.HumanStrategy[card.PokerCard]{})
 		humanPlayer.NameHimSelf()
 		s.addShowdownPlayer(humanPlayer)
 	}
 
-	s.CardGameTemplate.Deck.Shuffle()
+	s.deck.Shuffle()
 
 	fmt.Printf("為 %d 位玩家各發放 %d 張起始手牌\n", len(s.showdownPlayers), s.rounds)
 	for i := 0; i < s.rounds; i++ {
 		for _, sPlayer := range s.showdownPlayers {
-			sPlayer.AddHandCard(s.CardGameTemplate.Deck.Draw())
+			sPlayer.AddHandCard(s.deck.Draw())
 		}
 	}
 
@@ -84,6 +88,9 @@ func (s *ShowdownGame) takeTurn() {
 		s.addTableCard(card)
 		fmt.Printf("玩家 %s 出一張牌 %s\n", sPlayer.GetName(), card.ToString())
 	}
+	s.compare()
+	s.clearTableCards()
+	s.currentRound++
 }
 
 func (s *ShowdownGame) isGameOver() bool {
@@ -108,7 +115,8 @@ func (s *ShowdownGame) showWinner() {
 	fmt.Printf("贏家是: %s\n", winner.GetName())
 }
 
-func (s *ShowdownGame) compare() struct{} {
+// compare handles the comparison logic of showdowm game
+func (s *ShowdownGame) compare() {
 	cards := s.getTableCards()
 	maxCardIndex := 0
 	for idx, card := range cards {
@@ -123,18 +131,16 @@ func (s *ShowdownGame) compare() struct{} {
 
 	s.showdownPlayers[maxCardIndex].GainPoint()
 	fmt.Printf("玩家 %s 獲得一分，目前得分: %d\n", s.showdownPlayers[maxCardIndex].GetName(), s.showdownPlayers[maxCardIndex].GetPoints())
-
-	return struct{}{}
 }
 
-// BeforeTakeTurn is a placeholder since we don't need to implement anything here
-func (s *ShowdownGame) beforeTakeTurn() {
-	s.CardGameTemplate.logger.Debug("before take turn...")
-}
+// // BeforeTakeTurn is a placeholder since we don't need to implement anything here
+// func (s *ShowdownGame) beforeTakeTurn() {
+// 	s.CardGameTemplate.logger.Debug("before take turn...")
+// }
 
-// afterTakeTurn is a placeholder since we don't need to implement anything here
-func (s *ShowdownGame) afterTakeTurn() {
-	s.CardGameTemplate.logger.Debug("after take turn...")
-	s.clearTableCards()
-	s.currentRound++
-}
+// // afterTakeTurn is a placeholder since we don't need to implement anything here
+// func (s *ShowdownGame) afterTakeTurn() {
+// 	s.CardGameTemplate.logger.Debug("after take turn...")
+// 	s.clearTableCards()
+// 	s.currentRound++
+// }

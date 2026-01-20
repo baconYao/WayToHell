@@ -21,7 +21,7 @@ type AIShowdownPlayer struct {
 	ShowdownPlayer
 }
 
-func NewShowdownPlayer(playerBehaviorStrategy PlayerBehaviorStrategy) *ShowdownPlayer {
+func NewShowdownPlayer(playerBehaviorStrategy PlayerBehaviorStrategy[card.PokerCard]) *ShowdownPlayer {
 	return &ShowdownPlayer{
 		BasePlayer: NewBasePlayer[card.PokerCard](playerBehaviorStrategy),
 		points:     0,

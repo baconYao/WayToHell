@@ -23,5 +23,5 @@ func (c UnoCard) ToString() string {
 		Yellow: "Yellow",
 		Green:  "Green",
 	}
-	return fmt.Sprintf("[%s %d]", colorName[c.Color], c.Number)
+	return fmt.Sprintf("<%s %d>", colorName[c.Color], c.Number)
 }

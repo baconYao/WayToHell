@@ -6,25 +6,21 @@ import (
 	"cardkit/internal/card"
 )
 
-type Hand struct {
-	Cards []card.Card
+type Hand[T card.Card] struct {
+	Cards []T
 }
 
-func (h *Hand) Add(c card.Card) {
+func (h *Hand[T]) Add(c T) {
 	h.Cards = append(h.Cards, c)
 }
 
-func (h *Hand) Size() int {
-	return len(h.Cards)
-}
-
-func (h *Hand) GetCards() []card.Card {
-	replica := make([]card.Card, len(h.Cards))
+func (h *Hand[T]) GetCards() []T {
+	replica := make([]T, len(h.Cards))
 	copy(replica, h.Cards)
 	return replica
 }
 
-func (h *Hand) Remove(index int) error {
+func (h *Hand[T]) Remove(index int) error {
 	if index < 0 || index >= len(h.Cards) {
 		return errors.New("index out of range of hand cards")
 	}
