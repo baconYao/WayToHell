@@ -88,21 +88,17 @@ func (w *World) HandleMove(from, to int) {
 	targetSprite := w.GetSprite(to)
 	if targetSprite != nil {
 		// 觸發碰撞處理程序
-		w.handleCollision(from, to)
+		req := &collision.CollisionRequest{
+			C1: w.grid[from], C2: w.grid[to],
+			World: w, FROM: from, TO: to,
+		}
+		if !w.collisionHandler.Handle(req) { // 委派給碰撞處理器鏈
+			fmt.Println(">> 無法處理的碰撞，移動拒絕。")
+		}
 	} else {
 		// 沒有阻礙，直接移動
 		w.MoveSprite(from, to)
 		fmt.Printf(">> 移動成功：%c 從 %d 移到了 %d\n", movingSprite.GetID(), from, to)
-	}
-}
-
-func (w *World) handleCollision(x1, x2 int) {
-	req := &collision.CollisionRequest{
-		C1: w.grid[x1], C2: w.grid[x2],
-		World: w, FROM: x1, TO: x2,
-	}
-	if !w.collisionHandler.Handle(req) {
-		fmt.Println(">> 無法處理的碰撞，移動拒絕。")
 	}
 }
 
