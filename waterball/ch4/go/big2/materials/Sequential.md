@@ -8,6 +8,7 @@ sequenceDiagram
     participant R as Round
     participant CH as CardPatternHandler
     participant NP as NormalPlay
+    participant Card as Card
 
     Note over G,D: 【第一階段：遊戲初始化 NewGame()】
     G->>G: 從標準輸入讀取 5 行（牌堆 + 4 玩家名）
@@ -53,7 +54,7 @@ sequenceDiagram
                     P-->>G: return PassPlay
                 end
             else 輸入索引 (出牌)
-                P->>H: getCards() / 依索引取牌
+                P->>H: getCards()
                 H-->>P: cards
                 P->>CH: validate(cards)
                 CH-->>P: Handler 或 nil
@@ -62,22 +63,30 @@ sequenceDiagram
                     P->>P: 顯示「此牌型不合法」，繼續迴圈
                 else 取得 Handler
                     P->>R: checkFirstMoveRule(cards)
+                    R->>Card: compare(梅花3) 檢查是否含首手
+                    Card-->>R: 比對結果
                     R-->>P: isValid
 
                     alt 違反首手規則
                         P->>P: 顯示「首局第一手必須包含梅花 3」，繼續迴圈
                     else 通過
                         P->>NP: NewNormalPlay(playerIndex, handler)
+                        Note over NP: norm 持有 handler（context）、複製 cards 與 compareCard
                         NP-->>P: norm
                         P->>R: getTopPlay()
                         R-->>P: topPlay
                         P->>NP: isStrongerThan(topPlay)
+                        Note over NP: handler.IsSameType(other.Handler()) 同型後
+                        NP->>Card: compare(other.CompareCard)
+                        Card-->>NP: 比大結果
                         NP-->>P: stronger
 
                         alt stronger == false
                             P->>P: 顯示「此牌型不合法」，繼續迴圈
                         else stronger == true
-                            P->>H: removeCards(norm.getCards())
+                            P->>NP: patternName(), getCards()
+                            P->>P: 輸出「玩家 X 打出了 Y Z」
+                            P->>H: removeCards(norm.GetCards())
                             P-->>G: return NormalPlay
                         end
                     end

@@ -131,7 +131,7 @@ func (p *Player) Play(chain cardpatternhandler.Handler, r *round.Round) play.Pla
 			// fmt.Println("牌不夠大，請重新出牌")
 			continue
 		}
-		fmt.Printf("玩家 %s 打出了 %s %s\n", p.Name, norm.PatternName, formatCards(norm.GetCards()))
+		fmt.Printf("玩家 %s 打出了 %s %s\n", p.Name, norm.PatternName(), formatCards(norm.GetCards()))
 		p.Hand.RemoveCards(norm.GetCards())
 		return norm
 	}

@@ -98,12 +98,14 @@ classDiagram
     }
 
     class NormalPlay {
+        -CardPatternHandler handler
         -int playerIndex
-        -List~Card~ cardsSnapshot
+        -List~Card~ cards
         -Card compareCard
-        -String patternName
         +getPlayerIndex() int
         +getCards() List~Card~
+        +patternName() String
+        +handler() CardPatternHandler
         +isStrongerThan(other: Play) boolean
     }
 
@@ -115,7 +117,9 @@ classDiagram
     }
 
     class CardPatternHandler {
-        <<interface>>
+        <<abstract>>
+        #next: CardPatternHandler
+        #cards: List~Card~
         +setNext(handler: CardPatternHandler) void
         +validate(cards: List~Card~) CardPatternHandler
         +name() String
@@ -124,10 +128,10 @@ classDiagram
         +cards() List~Card~
     }
 
-    class Single { +isValid(sortedCards: List~Card~) boolean, +getComparisonCard() Card }
-    class Pair { +isValid(sortedCards: List~Card~) boolean, +getComparisonCard() Card }
-    class Straight { +isValid(sortedCards: List~Card~) boolean, +getComparisonCard() Card }
-    class FullHouse { +isValid(sortedCards: List~Card~) boolean, +getComparisonCard() Card }
+    class Single { +validate(cards) CardPatternHandler, +name() String, +getComparisonCard() Card, +isSameType(other) boolean, +cards() List~Card~ }
+    class Pair { +validate(cards) CardPatternHandler, +name() String, +getComparisonCard() Card, +isSameType(other) boolean, +cards() List~Card~ }
+    class Straight { +validate(cards) CardPatternHandler, +name() String, +getComparisonCard() Card, +isSameType(other) boolean, +cards() List~Card~ }
+    class FullHouse { +validate(cards) CardPatternHandler, +name() String, +getComparisonCard() Card, +isSameType(other) boolean, +cards() List~Card~ }
 
     %% 關係連結
     Game "1" *-- "4" Player
@@ -148,8 +152,10 @@ classDiagram
     Play <|.. NormalPlay
     Play <|.. PassPlay
     Player "1" ..> "0..*" Play : returns
+    NormalPlay "1" *-- "1" CardPatternHandler : pattern
+    NormalPlay "0..1" o-- "1..*" Card : cards
 
-    CardPatternHandler "1" --> "0..1" CardPatternHandler : next
+    CardPatternHandler "1" *-- "0..1" CardPatternHandler : next
     CardPatternHandler "1" o-- "1..5" Card : contains
     CardPatternHandler <|-- Single
     CardPatternHandler <|-- Pair
