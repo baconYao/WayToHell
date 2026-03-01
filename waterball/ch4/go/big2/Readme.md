@@ -3,6 +3,8 @@
 ## How to execute?
 
 ```go
+$ make help
+
 $ make run
 
 // Debug
