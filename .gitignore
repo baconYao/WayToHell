@@ -10,6 +10,8 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+# Big2 測資的預期輸出要納版控
+!waterball/ch4/go/big2/tests/*.out
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
