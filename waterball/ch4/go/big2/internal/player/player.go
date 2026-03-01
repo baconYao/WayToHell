@@ -41,6 +41,11 @@ func (p *Player) AddHandCard(c card.Card) {
 // ShowCards 輸出「輪到<名字>了」與手牌索引、牌面兩行；索引對齊下方牌面寬度，牌面以空白分隔。
 func (p *Player) ShowCards() {
 	fmt.Printf("輪到%s了\n", p.Name)
+	p.showHandOnly()
+}
+
+// showHandOnly 只輸出手牌索引與牌面兩行（不輸出「輪到XX了」），用於同一玩家重試時。
+func (p *Player) showHandOnly() {
 	if p.Hand == nil || p.Hand.Len() == 0 {
 		return
 	}
@@ -66,10 +71,16 @@ func (p *Player) ShowCards() {
 	fmt.Println()
 }
 
-// Play 讀取一行輸入，驗證並回傳合法出牌；不合法則輸出錯誤並重試。
+// Play 讀取一行輸入，驗證並回傳合法出牌；不合法則輸出錯誤並重試。僅在該玩家輪到時第一次顯示「輪到XX了」，重試時只顯示手牌兩行。
 func (p *Player) Play(chain cardpatternhandler.Handler, r *round.Round, readLine func() string) play.Play {
+	first := true
 	for {
-		p.ShowCards()
+		if first {
+			p.ShowCards()
+			first = false
+		} else {
+			p.showHandOnly()
+		}
 		line := strings.TrimSpace(readLine())
 		if line == "-1" || line == "1" {
 			if r.GetTopPlay() == nil {
@@ -108,7 +119,8 @@ func (p *Player) Play(chain cardpatternhandler.Handler, r *round.Round, readLine
 		}
 		norm := play.NewNormalPlay(p.Index, h)
 		if !norm.IsStrongerThan(r.GetTopPlay()) {
-			fmt.Println("牌不夠大，請重新出牌")
+			fmt.Println("此牌型不合法，請再嘗試一次。")
+			// fmt.Println("牌不夠大，請重新出牌")
 			continue
 		}
 		fmt.Printf("玩家 %s 打出了 %s %s\n", p.Name, norm.PatternName, formatCards(norm.GetCards()))
