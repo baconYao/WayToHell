@@ -2,6 +2,7 @@
 package player
 
 import (
+	"bufio"
 	"fmt"
 	"strings"
 
@@ -13,11 +14,12 @@ import (
 	"big2/internal/utils"
 )
 
-// Player 玩家：索引、名稱、手牌。
+// Player 玩家：索引、名稱、手牌、共用輸入 scanner（由 Game 在 Run 前設定，Play 內用 utils.ReadLineFromScanner 讀取）。
 type Player struct {
-	Index int
-	Name  string
-	Hand  *handcards.HandCards
+	Index   int
+	Name    string
+	Hand    *handcards.HandCards
+	scanner *bufio.Scanner
 }
 
 // New 建立玩家。index 為 0..3。手牌由呼叫方以 SetHand 設定。
@@ -28,6 +30,11 @@ func New(index int, name string) *Player {
 // SetHand 設定手牌（由 game 在發牌前呼叫）。
 func (p *Player) SetHand(h *handcards.HandCards) {
 	p.Hand = h
+}
+
+// SetScanner 設定共用的輸入 scanner（由 Game 在 Run 前呼叫，Play 內以 utils.ReadLineFromScanner 讀取）。
+func (p *Player) SetScanner(s *bufio.Scanner) {
+	p.scanner = s
 }
 
 // AddHandCard 加入一張手牌。
@@ -71,7 +78,8 @@ func (p *Player) showHandOnly() {
 }
 
 // Play 讀取一行輸入，驗證並回傳合法出牌；不合法則輸出錯誤並重試。僅在該玩家輪到時第一次顯示「輪到XX了」，重試時只顯示手牌兩行。
-func (p *Player) Play(chain cardpatternhandler.Handler, r *round.Round, readLine func() string) play.Play {
+func (p *Player) Play(chain cardpatternhandler.Handler, r *round.Round) play.Play {
+	readLine := utils.ReadLineFromScanner(p.scanner)
 	first := true
 	for {
 		if first {

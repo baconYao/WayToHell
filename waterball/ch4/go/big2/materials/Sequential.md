@@ -6,112 +6,101 @@ sequenceDiagram
     participant P as Player
     participant H as HandCards
     participant R as Round
-    participant CH as CardPatternHandler (Base)
-    participant CCH as ConcreteHandler
+    participant CH as CardPatternHandler
     participant NP as NormalPlay
-    participant Card as Card
 
-    Note over G, D: 【第一階段：遊戲初始化】
-    G->>G: initializeGame() (建立玩家、串接責任鏈)
-    G->>D: shuffle()
-    loop 52 次
+    Note over G,D: 【第一階段：遊戲初始化 NewGame()】
+    G->>G: 從標準輸入讀取 5 行（牌堆 + 4 玩家名）
+    G->>D: NewFromShuffledCards(lines[0])
+    D-->>G: deck
+    loop 建立 4 位玩家
+        G->>P: New(index, name)
+        G->>H: New()
+        G->>P: setHand(hand)
+        G->>P: setScanner(scanner)
+    end
+    loop 52 次發牌
         G->>D: deal()
         D-->>G: Card
         G->>P: addHandCard(Card)
         P->>H: addCard(Card)
     end
-    G->>G: starter = findPlayerWithClub3()
+    G->>G: patternChain = BuildChain()
+    G->>G: starterIndex = findPlayerWithClub3()
     G->>G: isFirstRound = true
 
-    Note over G, NP: 【第二階段：遊戲核心循環 (Game.run)】
-    loop 直到某玩家 HandCards.isEmpty()
-        G->>R: create(isFirstRound)
-        G->>R: start(starter)
-        Note over R: New Round (topPlay = nil, passCount = 0)
+    Note over G,R: 【第二階段：遊戲主循環 run()】
+    loop 直到 winner != nil
+        G->>R: new(isFirstRound)
+        R-->>G: round
+        G->>R: start(starterIndex)
 
-        loop 直到 passCount == 3 (isRoundEnded)
-            Note over P: 【玩家決策與輸入解析 (Player.play)】
-            loop 直到回傳合法且足夠強的 Play
-                P->>P: showCards() (顯示目前手牌)
-                Note right of P: 使用者輸入 (e.g. "0 1 2" 或 "-1")
+        loop 直到 isRoundEnded()
+            G->>R: currentPlayerIndex()
+            R-->>G: idx
+            G->>P: play(patternChain, round)
 
-                alt 輸入為 "-1" (Pass)
-                    P->>R: getTopPlay()
-                    alt topPlay == nil
-                        P-->>P: 顯示「你不能在新回合中喊 Pass」
-                    else
-                        P-->>R: return PassPlay
-                    end
-                else 輸入索引 (出牌)
-                    P->>P: selectCards() (獲取 selectedCards)
+            Note over P,CH: 【Player.Play 內：取得輸入與決策】
+            P->>P: showCards()
+            P->>P: readLine() 取得一行輸入（utils.ReadLineFromScanner(p.scanner)）
 
-                    Note over P, CH: 【第三階段：牌型鑑定與規則校驗】
-                    P->>CH: validate(selectedCards)
-                    CH->>CH: sortCards()
-                    CH->>CH: handleValidate(sortedCards)
-                    CH->>CCH: isValid(sortedCards)
+            alt 輸入 "-1" (Pass)
+                P->>R: getTopPlay()
+                R-->>P: topPlay
+                alt topPlay == nil
+                    P->>P: 顯示「你不能在新的回合中喊 PASS」，繼續迴圈
+                else topPlay != nil
+                    P-->>G: return PassPlay
+                end
+            else 輸入索引 (出牌)
+                P->>H: getCards() / 依索引取牌
+                H-->>P: cards
+                P->>CH: validate(cards)
+                CH-->>P: Handler 或 nil
 
-                    alt 牌型不匹配
-                        CH-->>P: return nil
-                        P-->>P: 顯示「此牌型不合法，請再嘗試一次。」
-                    else 取得 Handler
-                        CH-->>P: return myPatternHandler
+                alt validate 回傳 nil
+                    P->>P: 顯示「此牌型不合法」，繼續迴圈
+                else 取得 Handler
+                    P->>R: checkFirstMoveRule(cards)
+                    R-->>P: isValid
 
-                        P->>R: checkFirstMoveRule(selectedCards)
-                        R-->>P: return isValid
+                    alt 違反首手規則
+                        P->>P: 顯示「首局第一手必須包含梅花 3」，繼續迴圈
+                    else 通過
+                        P->>NP: NewNormalPlay(playerIndex, handler)
+                        NP-->>P: norm
+                        P->>R: getTopPlay()
+                        R-->>P: topPlay
+                        P->>NP: isStrongerThan(topPlay)
+                        NP-->>P: stronger
 
-                        alt 違反梅花 3 規則
-                            P-->>P: 顯示「首局第一手必須包含梅花 3」
-                        else 通過開局規則
-                            P->>NP: create(player, myPatternHandler)
-
-                            Note over P, NP: 【第四階段：強弱判定 (方案二實作)】
-                            P->>R: getTopPlay()
-                            R-->>P: return topPlay
-
-                            P->>NP: isStrongerThan(topPlay)
-                            activate NP
-                            alt topPlay == nil
-                                Note over NP: 直接視為最強
-                                NP-->>P: return true
-                            else topPlay != nil
-                                NP->>CH: isSameType(topPlay.getPattern())
-                                alt 牌型不一致
-                                    CH-->>NP: return false
-                                else 牌型一致
-                                    CH-->>NP: return true
-                                    NP->>CH: getComparisonCard() (myBase)
-                                    NP->>NP: topPlay.pattern.getComparisonCard() (topBase)
-                                    NP->>Card: myBase.compare(topBase)
-                                    Card-->>NP: return result
-                                end
-                                NP-->>P: return (result > 0)
-                            end
-                            deactivate NP
-
-                            alt isStrongerThan == true
-                                P-->>R: return NormalPlay
-                            else
-                                P-->>P: 顯示「牌不夠大，請重新出牌」
-                            end
+                        alt stronger == false
+                            P->>P: 顯示「此牌型不合法」，繼續迴圈
+                        else stronger == true
+                            P->>H: removeCards(norm.getCards())
+                            P-->>G: return NormalPlay
                         end
                     end
                 end
             end
 
-            Note over R, H: 【第五階段：回合狀態更新】
-            alt 收到 NormalPlay
-                R->>R: topPlay = NormalPlay, passCount = 0
-                R->>P: removeCards(selectedCards)
-                P->>H: removeCards(selectedCards)
-            else 收到 PassPlay
+            Note over G,R: 【回合狀態更新】
+            G->>R: acceptPlay(playResult)
+            alt NormalPlay
+                R->>R: topPlay = playResult, passCount = 0
+            else PassPlay
                 R->>R: passCount++
             end
-            R->>R: nextPlayer()
+            alt NormalPlay 且 該玩家 hand.isEmpty()
+                G->>G: winner = 當前玩家
+            end
+            G->>R: nextPlayer()
         end
-        R-->>G: return RoundWinner (topPlay.player)
-        G->>G: starter = RoundWinner
-        G->>G: isFirstRound = false
+
+        G->>R: roundWinnerIndex()
+        R-->>G: starterIndex
+        G->>G: starterIndex = 回傳值, isFirstRound = false
     end
-    G->>G: 宣告贏家
+
+    G->>G: 宣告贏家 winner.Name
 ```

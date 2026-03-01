@@ -9,9 +9,9 @@ type Deck struct {
 	cards []card.Card
 }
 
-// NewFromString 從規格格式的一行字串建立牌堆（空白分隔，例如 "S[8] S[9] C[3] ..."）。
+// NewFromShuffledCards 從規格格式的一行字串建立牌堆（空白分隔，例如 "S[8] S[9] C[3] ..."）。
 // 輸入順序為左＝底部、右＝頂部，發牌時會從頂部開始取。
-func NewFromString(line string) (*Deck, error) {
+func NewFromShuffledCards(line string) (*Deck, error) {
 	cards, err := card.ParseCards(line)
 	if err != nil {
 		return nil, err

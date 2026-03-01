@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	g, err := game.NewFromStdin()
+	g, err := game.NewGame()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "初始化遊戲失敗: %v\n", err)
 		os.Exit(1)
