@@ -16,6 +16,7 @@ import (
 	"big2/internal/play"
 	"big2/internal/player"
 	"big2/internal/round"
+	"big2/internal/utils"
 )
 
 // Game 一局大老二：四位玩家、牌堆、牌型責任鏈、是否首回合、下一回合先出牌者索引。
@@ -99,7 +100,7 @@ func findPlayerWithClub3(players []*player.Player) int {
 
 // Run 執行遊戲主循環：每回合由 starter 先出牌，直到有人手牌出完則宣告贏家。
 func (g *Game) Run() {
-	readLine := player.ReadLineFromScanner(g.scanner)
+	readLine := utils.ReadLineFromScanner(g.scanner)
 	starterIndex := g.starterIndex
 	for g.winner == nil {
 		fmt.Println("新的回合開始了。")
