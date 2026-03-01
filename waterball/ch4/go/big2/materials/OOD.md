@@ -91,10 +91,10 @@ classDiagram
     }
 
     class Play {
-        <<abstract>>
-        #Player player
-        +getPlayer() Player
-        +isStrongerThan(other: Play) boolean*
+        <<interface>>
+        +getPlayerIndex() int
+        +isStrongerThan(other: Play) boolean
+        +getCards() List~Card~
     }
 
     class NormalPlay {
@@ -108,6 +108,9 @@ classDiagram
     }
 
     class PassPlay {
+        -int playerIndex
+        +getPlayerIndex() int
+        +getCards() List~Card~
         +isStrongerThan(other: Play) boolean
     }
 
@@ -142,9 +145,9 @@ classDiagram
     Card o-- Rank
     Card o-- Suit
 
-    Play <|-- NormalPlay
-    Play <|-- PassPlay
-    Play "0..*" o-- "1" Player : issued by
+    Play <|.. NormalPlay
+    Play <|.. PassPlay
+    Player "1" ..> "0..*" Play : returns
 
     CardPatternHandler "1" --> "0..1" CardPatternHandler : next
     CardPatternHandler "1" o-- "1..5" Card : contains
