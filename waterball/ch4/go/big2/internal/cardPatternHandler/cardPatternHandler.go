@@ -2,11 +2,7 @@
 // 並支援單張、對子、順子、葫蘆等。擴充新牌型時僅新增 Handler，符合 OCP。
 package cardpatternhandler
 
-import (
-	"sort"
-
-	"big2/internal/card"
-)
+import "big2/internal/card"
 
 // Handler 牌型責任鏈節點：驗證選牌、回傳比較用牌、判斷是否同類型。
 type Handler interface {
@@ -30,11 +26,6 @@ func (b *Base) Cards() []card.Card {
 	out := make([]card.Card, len(b.cards))
 	copy(out, b.cards)
 	return out
-}
-
-// sortCards 依牌大小排序（同 package 內 concrete handler 使用）。
-func sortCards(cards []card.Card) {
-	sort.Slice(cards, func(i, j int) bool { return cards[i].Compare(cards[j]) < 0 })
 }
 
 // BuildChain 建立責任鏈：Single -> Pair -> Straight -> FullHouse，回傳鏈頭。

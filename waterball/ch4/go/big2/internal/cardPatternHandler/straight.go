@@ -20,7 +20,7 @@ func (st *Straight) Validate(cards []card.Card) Handler {
 		}
 		return nil
 	}
-	sortCards(cards)
+	card.SortCards(cards)
 	idx := make([]int, 5)
 	for i := range cards {
 		idx[i] = rankIndex(cards[i].Rank)

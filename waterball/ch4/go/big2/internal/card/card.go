@@ -3,6 +3,7 @@ package card
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -109,6 +110,11 @@ func (c Card) Compare(other Card) int {
 		return d
 	}
 	return int(c.Suit) - int(other.Suit)
+}
+
+// SortCards 依牌大小（Compare）原地排序 slice，由小到大。
+func SortCards(cards []Card) {
+	sort.Slice(cards, func(i, j int) bool { return cards[i].Compare(cards[j]) < 0 })
 }
 
 func (c Card) String() string {

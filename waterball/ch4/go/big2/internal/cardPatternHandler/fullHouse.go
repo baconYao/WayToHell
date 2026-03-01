@@ -14,7 +14,7 @@ func (f *FullHouse) Validate(cards []card.Card) Handler {
 		}
 		return nil
 	}
-	sortCards(cards)
+	card.SortCards(cards)
 	rankCount := make(map[card.Rank]int)
 	for _, c := range cards {
 		rankCount[c.Rank]++

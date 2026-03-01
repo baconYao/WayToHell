@@ -14,7 +14,7 @@ func (p *Pair) Validate(cards []card.Card) Handler {
 		}
 		return nil
 	}
-	sortCards(cards)
+	card.SortCards(cards)
 	if cards[0].Rank != cards[1].Rank {
 		if p.next != nil {
 			return p.next.Validate(cards)
