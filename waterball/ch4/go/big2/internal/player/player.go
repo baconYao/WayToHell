@@ -82,7 +82,7 @@ func (p *Player) Play(chain cardpatternhandler.Handler, r *round.Round, readLine
 			p.showHandOnly()
 		}
 		line := strings.TrimSpace(readLine())
-		if line == "-1" || line == "1" {
+		if line == "-1" {
 			if r.GetTopPlay() == nil {
 				fmt.Println("你不能在新的回合中喊 PASS")
 				continue

@@ -39,6 +39,7 @@ func isStraightRanks(idx []int) bool {
 	s := make([]int, 5)
 	copy(s, idx)
 	sort.Ints(s)
+	// 非環狀：五張連續，如 0,1,2,3,4
 	if s[4]-s[0] == 4 {
 		for i := 0; i < 4; i++ {
 			if s[i+1]-s[i] != 1 {
@@ -47,10 +48,25 @@ func isStraightRanks(idx []int) bool {
 		}
 		return true
 	}
-	if s[0] == 0 && s[4] == 12 && s[3]-s[0] == 3 {
-		return s[1] == 1 && s[2] == 2
+	// 環狀：含 0 與 12，四段間隔中恰有一段為 9（跨 2→3），其餘為 1
+	// 例如 0,1,2,3,12（2-3-4-5-6）、0,9,10,11,12（Q-K-A-2-3）等
+	if s[0] != 0 || s[4] != 12 {
+		return false
 	}
-	return false
+	g1 := s[1] - s[0]
+	g2 := s[2] - s[1]
+	g3 := s[3] - s[2]
+	g4 := s[4] - s[3]
+	// 四段中恰有一段為 9，其餘為 1
+	nine, one := 0, 0
+	for _, g := range []int{g1, g2, g3, g4} {
+		if g == 9 {
+			nine++
+		} else if g == 1 {
+			one++
+		}
+	}
+	return nine == 1 && one == 3
 }
 
 func (st *Straight) Name() string { return "順子" }
